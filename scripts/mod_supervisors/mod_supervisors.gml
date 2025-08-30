@@ -73,6 +73,8 @@ function mod_register_supervisor(supervisor, supervisor_id, wod = global.cmod) {
 	bimap_set(global.registry[mod_resources.supervisor], full_id, supervisor)
 	array_push(wod.supervisors)
 	log_info($"Supervisor {full_id} registered");
+	array_push(agi("obj_GAME").U_SV, 0)
+	array_push(agi("obj_GAME").SV_HS, 0)
 	return supervisor;
 }
 
