@@ -1,9 +1,9 @@
 {
-  "resourceType": "GMObject",
-  "resourceVersion": "1.0",
-  "name": "obj_ParPerk",
+  "$GMObject": "",
+  "%Name": "obj_ParPerk",
   "eventList": [],
   "managed": true,
+  "name": "obj_ParPerk",
   "overriddenProperties": [],
   "parent": {
     "name": "Fake Objects",
@@ -24,6 +24,8 @@
   "physicsShapePoints": [],
   "physicsStartAwake": true,
   "properties": [],
+  "resourceType": "GMObject",
+  "resourceVersion": "2.0",
   "solid": false,
   "spriteId": null,
   "spriteMaskId": null,

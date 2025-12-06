@@ -100,7 +100,7 @@ function put_disallowed_functions(hashset) {
 	hashset_put(hashset, "write_autosave_array")
 	hashset_put(hashset, "load_forgery_autosave")
 	hashset_put(hashset, "find_string_id_from_data")
-	hashset_put(hashset, "get_struct_discompliance_with_contract")
+	hashset_put(hashset, "get_struct_compliance_with_contract")
 	hashset_put(hashset, "generate_discompliance_error_text")
 	hashset_put(hashset, "initialize_missing")
 	hashset_put(hashset, "__catspeak_infer_function_name")

@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "GMLspeakParser",
-  "isCompatibility": false,
-  "isDnD": false,
-  "parent": {
-    "name": "Internal",
-    "path": "folders/GMLspeak/Internal.yy",
+  "$GMScript":"v1",
+  "%Name":"GMLspeakParser",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"GMLspeakParser",
+  "parent":{
+    "name":"Internal",
+    "path":"folders/GMLspeak/Internal.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

@@ -32,10 +32,10 @@ function mod_register_item(item, item_id, wod = global.cmod) {
 	}
 
 	
-	var discompliance = get_struct_discompliance_with_contract(item, item_contract)
-	if array_length(discompliance.missing) > 0 || array_length(discompliance.mismatched_types) > 0 {
+	var compliance = get_struct_compliance_with_contract(item, item_contract)
+	if array_length(compliance.missing) > 0 || array_length(compliance.mismatched_types) > 0 {
 		log_error($"Item {item_id} from {wod.mod_id} has bad variables!\n" 
-			+ generate_discompliance_error_text(item, item_contract, discompliance)
+			+ generate_compliance_error_text(item, item_contract, compliance)
 			+ "\nThe item is not registered.")
 		return;
 	}

@@ -1,9 +1,9 @@
 {
-  "resourceType": "GMObject",
-  "resourceVersion": "1.0",
-  "name": "obj_Interactable",
+  "$GMObject": "",
+  "%Name": "obj_Interactable",
   "eventList": [],
   "managed": true,
+  "name": "obj_Interactable",
   "overriddenProperties": [],
   "parent": {
     "name": "Fake Objects",
@@ -24,6 +24,8 @@
   "physicsShapePoints": [],
   "physicsStartAwake": true,
   "properties": [],
+  "resourceType": "GMObject",
+  "resourceVersion": "2.0",
   "solid": false,
   "spriteId": null,
   "spriteMaskId": null,

@@ -1,5 +1,0 @@
-meta:
-target = gml_Object_obj_ItemMGMT_Create_0
-patch:
-move_to_end()
-write_after('register_items_for_gameplay()')

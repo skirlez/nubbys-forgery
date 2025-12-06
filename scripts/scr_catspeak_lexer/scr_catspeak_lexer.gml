@@ -179,7 +179,7 @@ enum CatspeakToken {
     ///   raise an exception. This likely indicates that a Catspeak script has
     ///   a syntax error somewhere.
     OTHER = 64,
-    /// @ignore
+   
     __SIZE__ = 68,
 }
 

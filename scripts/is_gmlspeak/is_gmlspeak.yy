@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "is_gmlspeak",
-  "isCompatibility": false,
-  "isDnD": false,
-  "parent": {
-    "name": "GMLspeak",
-    "path": "folders/GMLspeak.yy",
+  "$GMScript":"v1",
+  "%Name":"is_gmlspeak",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"is_gmlspeak",
+  "parent":{
+    "name":"GMLspeak",
+    "path":"folders/GMLspeak.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

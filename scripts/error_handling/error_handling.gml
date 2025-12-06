@@ -1,4 +1,4 @@
-/*
+
 function optional_empty() constructor {
 	self.get = method(self, function() {
 		throw ("Called get() on an empty optional!")
@@ -6,9 +6,7 @@ function optional_empty() constructor {
 	self.get_or_else = method(self, function(else_var) {
 		return else_var;
 	});
-	self.is_empty = method(self, function() {
-		return true;
-	});
+	self.is_empty = true;
 }
 function optional_value(val) constructor {
 	self.val = val;
@@ -18,11 +16,9 @@ function optional_value(val) constructor {
 	self.get_or_else = method(self, function(else_var) {
 		return val;
 	});
-	self.is_empty = method(self, function() {
-		return false;
-	});
+	self.is_empty = false;
 }
-*/
+
 
 function result_ok(value) constructor {
 	self.value = value;

@@ -21,25 +21,33 @@ function create_mod(mod_folder_name) {
 			$"Error while parsing mod.json in mod folder {mod_folder_name}: {pretty_error(e)}"));
 	}
 	
+	if !variable_struct_exists(wod, "custom")
+		return new result_ok(new optional_empty())
+	if !is_struct(wod.custom) || !variable_struct_exists(wod.custom, "forgery")
+		return new result_ok(new optional_empty())
+		
 	static mod_contract = {
 		mod_id : "",
 		display_name : "",
 		description : "",
 		version : "",
 		credits : [],
-		target_modloader_version : 0,
-		entrypoint_path : "",
-		translations_path : "",
-		compile_all_code_on_load : false
+		custom : {
+			forgery : {
+				entrypoint : { type : ""},
+				translations_path : "",
+				compile_all_code_on_load : false
+			}
+		},
 	}
 	
-	var discompliance = get_struct_discompliance_with_contract(wod, mod_contract)
-	if array_length(discompliance.missing) > 0 || array_length(discompliance.mismatched_types) > 0 {
-		return new result_error(new generic_error(
-			$"mod.json in {mod_folder_name} has bad variables:\n" 
-			+ generate_discompliance_error_text(wod, mod_contract, discompliance)
-		))
+	var compliance = get_struct_compliance_with_contract(wod, mod_contract)
+	if is_discompilant(compliance) {
+		return compliance_error(wod, mod_contract, compliance,
+			$"mod.json in {mod_folder_name} has bad variables")
 	}
+	
+	// TODO validate credits
 	
 	wod.folder_name = mod_folder_name;
 	wod.translations = ds_map_create();
@@ -49,28 +57,66 @@ function create_mod(mod_folder_name) {
 	wod.code_files = ds_map_create();
 	wod.functions = ds_map_create();
 
-	if wod.compile_all_code_on_load {
+	if wod.custom.forgery.compile_all_code_on_load {
 		log_info($"Compiling all files belonging to mod {wod.mod_id}")
 		compile_all_files_in_path_recursively("/", wod, wod.code_files)
 	}
+	
+	var entrypoint = wod.custom.forgery.entrypoint;
+	
 	global.cmod = wod;
-	try {
-		var mod_globals = mod_get_code_globals(wod.entrypoint_path, wod)
-	}
-	catch (e) {
-		return new result_error(new generic_error(e))
-	}
+	if entrypoint.type == "runtime" {
+		static entrypoint_runtime_contract = {
+			type : "",
+			path : "",
+		}
+		var entrypoint_runtime_compliance = get_struct_compliance_with_contract(entrypoint, entrypoint_runtime_contract)
+		if is_discompilant(entrypoint_runtime_compliance) {
+			return compliance_error(wod, entrypoint_runtime_contract, entrypoint_runtime_compliance,
+				$"mod.json in {mod_folder_name} has bad entrypoint variables")
+		}
+		
+		try {
+			var mod_globals = mod_get_code_globals(entrypoint.path, wod)
+		}
+		catch (e) {
+			return new result_error(new generic_error(e))
+		}
 
-	static mod_globals_contract = {
-		on_load : global.empty_method,
-		on_unload : global.empty_method,
+		static mod_globals_contract = {
+			on_load : global.empty_method,
+			on_unload : global.empty_method,
+		}
+		var mod_globals_compliance = get_struct_compliance_with_contract(mod_globals, mod_globals_contract)
+		if is_discompilant(mod_globals_compliance) {
+			return new result_error(new generic_error(
+				$"Mod entrypoint {entrypoint} has bad variables:\n" 
+				+ generate_compliance_error_text(mod_globals, mod_globals_contract, compliance)
+			))
+		}
+		
+		wod.on_load = mod_globals.on_load;
+		wod.on_unload = mod_globals.on_unload;
 	}
-	var discompliance = get_struct_discompliance_with_contract(mod_globals, mod_globals_contract)
-	if array_length(discompliance.missing) > 0 || array_length(discompliance.mismatched_types) > 0 {
+	else if entrypoint.type == "compiled" {
+		static entrypoint_compiled_contract = {
+			type : "",
+			on_load : "",
+			on_unload : ""
+		}
+		var entrypoint_compiled_compliance = get_struct_compliance_with_contract(entrypoint, entrypoint_runtime_contract)
+		if is_discompilant(entrypoint_compiled_compliance) {
+			return compliance_error(wod, entrypoint_compiled_contract, entrypoint_compiled_compliance,
+				$"mod.json in {mod_folder_name} has bad entrypoint variables")
+		}
+		wod.on_load = agi(entrypoint.on_load);
+		wod.on_unload = agi(entrypoint.on_unload);
+	}
+	else {
 		return new result_error(new generic_error(
-			$"Mod entrypoint {wod.entrypoint_path} has bad variables:\n" 
-			+ generate_discompliance_error_text(mod_globals, mod_globals_contract, discompliance)
-		))
+			$"mod.json in {mod_folder_name} has invalid entrypoint type: {entrypoint.type}\n"
+			+ "(valid: \"runtime\", \"compiled\")"
+		))	
 	}
 	
 	
@@ -88,7 +134,7 @@ function create_mod(mod_folder_name) {
 	wod.autosave_load_callbacks = []
 	
 	// TODO check invalid characters
-	return new result_ok(wod)
+	return new result_ok(new optional_value(wod))
 }
 
 
@@ -205,9 +251,8 @@ function strip_initial_path_separator_character(path) {
 function unload_mod(wod) {
 	log_info($"Unloading mod {wod.mod_id}")
 	global.cmod = wod;
-	var main_globals = mod_get_code_globals(wod.entrypoint_path)
 	try {
-		main_globals.on_unload();
+		wod.on_unload();
 	}
 	catch (e) {
 		log_error($"Mod {wod.mod_id} errored while unloading: {pretty_error(e)}")
@@ -294,14 +339,15 @@ function read_all_mods() {
 			log_error(mod_result.error.text)
 			continue;
 		}
-		var wod = mod_result.value
+		var wod_maybe = mod_result.value
+		if (wod_maybe.is_empty)
+			continue;
+		var wod = wod_maybe.get()
 		ds_map_set(global.mod_id_to_mod_map, wod.mod_id, wod);
 		
-		var main = mod_get_code(wod.entrypoint_path, wod)
-		var main_globals = catspeak_globals(main)
 		try {
 			global.cmod = wod;
-			main_globals.on_load();
+			wod.on_load();
 		}
 		catch (e) {
 			log_error($"Mod {wod.mod_id} errored on load: {pretty_error(e)}")

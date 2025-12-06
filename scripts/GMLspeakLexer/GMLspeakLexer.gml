@@ -15,7 +15,7 @@
 ///   - `12.3` (is a `CatspeakToken.VALUE`)
 ///   - `+`    (is a `CatspeakToken.PLUS`)
 enum GMLspeakToken {
-	__CATSPEAK_SIZE__ = CatspeakToken.__SIZE__,
+	__CATSPEAK_SIZE__ = 68, // (NUBBY'S FORGERY) https://github.com/YoYoGames/GameMaker-Bugs/issues/9824
 	REPEAT,
 	FOR,
 	DO,

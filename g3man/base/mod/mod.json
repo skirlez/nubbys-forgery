@@ -1,0 +1,21 @@
+{
+    "mod_id" : "forgery",
+    "display_name" : "Nubby's Forgery",
+    "description" : "Provides the Forgery API, allowing you to easily extend base game systems. Also enables running Catspeak/GMLspeak code.",
+    "icon_path" : "",
+    "credits" : ["skirlez"],
+    "version" : "1.0.0",
+    "target_game_version" : "V1.34",
+    "target_patcher_version" : "1",
+    "depends" : [],
+    "breaks" : [],
+
+    "patches" : [
+        {
+            "path" : "patches",
+            "type" : "gmlp"
+        }
+    ],
+    "datafile_path" : "mod_data.win",
+    "post_merge_script_path" : "on_merge.csx"
+}

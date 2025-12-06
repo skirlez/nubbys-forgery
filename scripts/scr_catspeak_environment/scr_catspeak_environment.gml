@@ -96,10 +96,7 @@ function CatspeakForeignInterface() constructor {
 				
                 var asset = asset_get_index(name);
                 if (asset != -1) {
-					// (NUBBY'S FORGERY) 5 is what it returns for scripts in this version of nubby, mismatched with asset_script from this runtime version
-					// (NUBBY'S FORGERY) you may conclude then, that the runtime version is mismatched, but I really don't know what the true version is,
-					// (NUBBY'S FORGERY) as it seems to be 5 in 2024.4 too, which is what UMT reports Nubby uses...
-					if (asset_get_type(name) == 5) { 
+					if (asset_get_type(name) == asset_script) { 
 						// (NUBBY'S FORGERY) check to see if it's a modloader function (don't want people to accidentally use one)
 						if hashset_contains(global.disallowed_functions_set, name) {
 							return undefined;	

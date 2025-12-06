@@ -13,7 +13,8 @@ function get_all_directories(dir) {
 	var directories = [];
 	var directory_name = file_find_first(dir + "/*", fa_directory);
 	while (directory_name != "") {
-		array_push(directories, directory_name);
+		if directory_exists($"{dir}/{directory_name}")
+			array_push(directories, directory_name);
 		directory_name = file_find_next();
 	}
 	file_find_close(); 

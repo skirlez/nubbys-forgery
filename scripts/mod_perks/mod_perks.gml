@@ -25,10 +25,10 @@ function mod_register_perk(perk, perk_id, wod = global.cmod) {
 		on_trigger : global.empty_method,
 	}
 
-	var discompliance = get_struct_discompliance_with_contract(perk, perk_contract)
-	if array_length(discompliance.missing) > 0 || array_length(discompliance.mismatched_types) > 0 {
+	var compliance = get_struct_compliance_with_contract(perk, perk_contract)
+	if array_length(compliance.missing) > 0 || array_length(compliance.mismatched_types) > 0 {
 		log_error($"Perk {perk_id} from {wod.mod_id} has bad variables!\n" 
-			+ generate_discompliance_error_text(perk, perk_contract, discompliance)
+			+ generate_compliance_error_text(perk, perk_contract, compliance)
 			+ "\nThe perk is not registered.")
 			
 		return;

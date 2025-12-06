@@ -23,10 +23,10 @@ function mod_register_supervisor(supervisor, supervisor_id, wod = global.cmod) {
 		on_destroy : global.empty_method,
 	}
 	
-	var discompliance = get_struct_discompliance_with_contract(supervisor, supervisor_contract)
-	if array_length(discompliance.missing) > 0 || array_length(discompliance.mismatched_types) > 0 {
+	var compliance = get_struct_compliance_with_contract(supervisor, supervisor_contract)
+	if array_length(compliance.missing) > 0 || array_length(compliance.mismatched_types) > 0 {
 		log_error($"Supervisor {supervisor_id} from {wod.mod_id} has bad variables!\n" 
-			+ generate_discompliance_error_text(supervisor, supervisor_contract, discompliance)
+			+ generate_compliance_error_text(supervisor, supervisor_contract, compliance)
 			+ "\nThe supervisor is not registered.")
 		return;
 	}
@@ -53,16 +53,16 @@ function mod_register_supervisor(supervisor, supervisor_id, wod = global.cmod) {
 		happy : idle_neutral_sprite,
 		idle_grimace : idle_neutral_sprite
 	}
-	var required = get_struct_discompliance_with_contract(supervisor.sprites, sprites_contract)
-	var optional = get_struct_discompliance_with_contract(supervisor.sprites, optional_sprites)
-	var sprites_discompliance = 
+	var required = get_struct_compliance_with_contract(supervisor.sprites, sprites_contract)
+	var optional = get_struct_compliance_with_contract(supervisor.sprites, optional_sprites)
+	var sprites_compliance = 
 	{
 		missing : required.missing,
 		mismatched_types : array_concat(required.mismatched_types, optional.mismatched_types)
 	}
-	if array_length(sprites_discompliance.missing) > 0 || array_length(sprites_discompliance.mismatched_types) > 0 {
+	if array_length(sprites_compliance.missing) > 0 || array_length(sprites_compliance.mismatched_types) > 0 {
 		log_error($"Supervisor {supervisor_id} from {wod.mod_id} has bad sprite variables!\n" 
-			+ generate_discompliance_error_text(supervisor.sprites, sprites_contract, sprites_discompliance)
+			+ generate_compliance_error_text(supervisor.sprites, sprites_contract, sprites_compliance)
 			+ "\nThe supervisor is not registered.")
 		return;
 	}

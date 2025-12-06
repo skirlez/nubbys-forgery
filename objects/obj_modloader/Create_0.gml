@@ -1,7 +1,7 @@
 global.empty_method = method(self, empty_function)
 global.mod_id_to_mod_map = ds_map_create();
 global.logging_socket = network_create_socket(network_socket_udp)
-global.mods_directory = "mods";
+global.mods_directory = "g3man_applied_profile";
 
 initialize_catspeak_gmlspeak();
 
@@ -15,9 +15,9 @@ while (sprite_exists(global.sprite_count))
 	global.sprite_count++;
 
 global.last_indices = array_create(mod_resources.size)
-global.last_indices[mod_resources.item] = 172
-global.last_indices[mod_resources.perk] = 30
-global.last_indices[mod_resources.supervisor] = 10
+global.last_indices[mod_resources.item] = 183
+global.last_indices[mod_resources.perk] = 32
+global.last_indices[mod_resources.supervisor] = 11
 
 log_info("****************\nModloader start\n****************")
 read_all_mods()

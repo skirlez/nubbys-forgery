@@ -2,7 +2,7 @@ import os
 
 base_path = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'scripts'))
 
-function = "function put_disallowed_functions(hashset) {\n"
+list = ""
 
 for folder_name in os.listdir(base_path):
 	folder_path = os.path.join(base_path, folder_name)
@@ -24,10 +24,9 @@ for folder_name in os.listdir(base_path):
 				continue
 
 			name = parts[1].split('(')[0]
-			if name.startswith('mod_'):
+			if not name.startswith('mod_'):
 				continue
 
-			function += f"hashset_put(hashset, \"{name}\")\n"
+			list += f"\"{name}\",\n"
 
-function += "}"
-print(function)
+print(list)
