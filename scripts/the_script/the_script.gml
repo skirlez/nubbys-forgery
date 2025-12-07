@@ -263,7 +263,7 @@ function unload_mod(wod) {
 		var callback = wod.callback_records[i].callback;
 		var game_event_name = wod.callback_records[i].game_event_name;
 		
-		var callback_mod_structs = ds_map_find_value(global.modloader_game_events, game_event_name)
+		var callback_mod_structs = ds_map_find_value(global.forgery_game_events, game_event_name)
 		for (var j = 0; j < array_length(callback_mod_structs); j++) {
 			if (callback_mod_structs[j].callback == callback) {
 				array_delete(callback_mod_structs, j, 1)
@@ -271,7 +271,7 @@ function unload_mod(wod) {
 			}
 		}
 		if array_length(callback_mod_structs) == 0
-			ds_map_delete(global.modloader_game_events, game_event_name);
+			ds_map_delete(global.forgery_game_events, game_event_name);
 	}
 	
 	for (var i = 0; i < array_length(wod.items); i++) {
@@ -382,13 +382,12 @@ function hot_reload() {
 		/*
 		for (var j = 0; j < array_length(wod.items); j++) {
 			var item = wod.items[j];
-			
 		}
 		*/
 	}
 }
 function get_nf_version_string() {
-	return "Nubby's Forgery BETA V3"	
+	return "Nubby's Forgery BETA V5"	
 }
 function get_nf_loaded_string() {
 	return $"({ds_map_size(global.mod_id_to_mod_map)} mod(s) loaded, "

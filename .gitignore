@@ -1,3 +1,4 @@
+# g3man related ignores
 g3man/igor
 g3man/out
 g3man/frida-config.ini
@@ -5,3 +6,8 @@ g3man/base/*
 !g3man/base/mod/
 g3man/__pycache__
 g3man/frida-timestamp.txt
+
+
+# Ignore meta folder non-script files
+meta/NNF_Full_LocalizationEN.csv
+meta/scr_GameEv.gml

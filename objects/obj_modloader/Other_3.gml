@@ -1,1 +1,0 @@
-log_info("Modloader Game End Event triggered. Goodbye!")

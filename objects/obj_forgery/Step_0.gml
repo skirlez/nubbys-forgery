@@ -5,9 +5,6 @@ if reroll_cheats_enabled() {
 	}
 }
 
-
-
-
 if keyboard_check_pressed(ord("R")) && room == agi("Roo_TitleMenu") {
 	log_info("R Pressed - Reloading mods")
 	clear_all_mods();

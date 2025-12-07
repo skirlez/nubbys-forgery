@@ -1,13 +1,13 @@
-global.modloader_game_events = ds_map_create();
+global.forgery_game_events = ds_map_create();
 
 function mod_subscribe_to_game_event(name, callback, wod = global.cmod) {
 	var arr;
-	if !ds_map_exists(global.modloader_game_events, name) {
+	if !ds_map_exists(global.forgery_game_events, name) {
 		arr = []
-		ds_map_add(global.modloader_game_events, name, arr)
+		ds_map_add(global.forgery_game_events, name, arr)
 	}
 	else
-		arr = ds_map_find_value(global.modloader_game_events, name)
+		arr = ds_map_find_value(global.forgery_game_events, name)
 	
 	array_push(wod.callback_records, {
 		game_event_name : name,
@@ -21,9 +21,9 @@ function mod_subscribe_to_game_event(name, callback, wod = global.cmod) {
 
 // Called from scr_GameEv
 function on_game_event(name, parameter_struct) {
-	if !ds_map_exists(global.modloader_game_events, name)
+	if !ds_map_exists(global.forgery_game_events, name)
 		return;
-	var arr = ds_map_find_value(global.modloader_game_events, name)
+	var arr = ds_map_find_value(global.forgery_game_events, name)
 	for (var i = 0; i < array_length(arr); i++) {
 		var struct = arr[i];
 		global.cmod = struct.mod_of_origin;

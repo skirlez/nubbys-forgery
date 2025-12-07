@@ -97,10 +97,6 @@ function CatspeakForeignInterface() constructor {
                 var asset = asset_get_index(name);
                 if (asset != -1) {
 					if (asset_get_type(name) == asset_script) { 
-						// (NUBBY'S FORGERY) check to see if it's a modloader function (don't want people to accidentally use one)
-						if hashset_contains(global.disallowed_functions_set, name) {
-							return undefined;	
-						}
 						return method(undefined, asset);	
                     }
                     return asset;

@@ -108,7 +108,7 @@ function load_button_is_save_loadable() {
 }
 // Called from gml_Object_obj_LoadGameBtn_Step_0
 function load_button_create_message(missing_resources) {
-	return instance_create_depth(x, y, depth - 1, agi("obj_modloader_message"), {
+	return instance_create_depth(x, y, depth - 1, agi("obj_forgery_message"), {
 		text : $"This autosave cannot be loaded,\nbecause the following resources are missing:\n{missing_resources}\nPlease delete this autosave, or load those resources."	
 	})
 }

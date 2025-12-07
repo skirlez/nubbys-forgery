@@ -1,6 +1,6 @@
 {
   "$GMSprite":"",
-  "%Name":"spr_modloader_message",
+  "%Name":"spr_forgery_message",
   "bboxMode":1,
   "bbox_bottom":19,
   "bbox_left":0,
@@ -21,7 +21,7 @@
   "layers":[
     {"$GMImageLayer":"","%Name":"951a471d-b616-48ef-b328-03b84c6bbff5","blendMode":0,"displayName":"default","isLocked":false,"name":"951a471d-b616-48ef-b328-03b84c6bbff5","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
   ],
-  "name":"spr_modloader_message",
+  "name":"spr_forgery_message",
   "nineSlice":{
     "$GMNineSliceData":"",
     "bottom":3,
@@ -33,7 +33,13 @@
     "resourceType":"GMNineSliceData",
     "resourceVersion":"2.0",
     "right":3,
-    "tileMode":[0,0,0,0,1,],
+    "tileMode":[
+      0,
+      0,
+      0,
+      0,
+      1,
+    ],
     "top":3,
   },
   "origin":4,
@@ -46,7 +52,7 @@
   "resourceVersion":"2.0",
   "sequence":{
     "$GMSequence":"v1",
-    "%Name":"spr_modloader_message",
+    "%Name":"spr_forgery_message",
     "autoRecord":true,
     "backdropHeight":768,
     "backdropImageOpacity":0.5,
@@ -70,7 +76,7 @@
       "resourceType":"KeyframeStore<MomentsEventKeyframe>",
       "resourceVersion":"2.0",
     },
-    "name":"spr_modloader_message",
+    "name":"spr_forgery_message",
     "playback":1,
     "playbackSpeed":30.0,
     "playbackSpeedType":0,
@@ -81,7 +87,9 @@
     "timeUnits":1,
     "tracks":[
       {"$GMSpriteFramesTrack":"","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"$KeyframeStore<SpriteFrameKeyframe>":"","Keyframes":[
-            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{"0":{"$SpriteFrameKeyframe":"","Id":{"name":"5f5114a5-dacc-4aa6-ad5b-58d0f3683c79","path":"sprites/spr_modloader_message/spr_modloader_message.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},},"Disabled":false,"id":"831c401b-0ad0-469a-acf3-67393bd4eef2","IsCreationKey":false,"Key":0.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"5f5114a5-dacc-4aa6-ad5b-58d0f3683c79","path":"sprites/spr_forgery_message/spr_forgery_message.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"831c401b-0ad0-469a-acf3-67393bd4eef2","IsCreationKey":false,"Key":0.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
           ],"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"2.0",},"modifiers":[],"name":"frames","resourceType":"GMSpriteFramesTrack","resourceVersion":"2.0","spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],
     "visibleRange":null,

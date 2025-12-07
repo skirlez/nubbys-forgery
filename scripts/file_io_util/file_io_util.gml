@@ -36,14 +36,9 @@ function get_file_extension(name) {
 }
 
 enum code_file_types {
-	gml,
 	catspeak,
 }
 
 function mod_get_code_type(path) {
-	var extension = get_file_extension(path)
-	if extension == "meow"
-		return code_file_types.catspeak;
-	else
-		return code_file_types.gml;
+	return code_file_types.catspeak;
 }

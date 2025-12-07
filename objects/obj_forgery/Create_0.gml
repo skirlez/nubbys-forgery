@@ -3,7 +3,7 @@ global.mod_id_to_mod_map = ds_map_create();
 global.logging_socket = network_create_socket(network_socket_udp)
 global.mods_directory = "g3man_applied_profile";
 
-initialize_catspeak_gmlspeak();
+initialize_catspeak();
 
 global.cmod = noone;
 
@@ -19,7 +19,7 @@ global.last_indices[mod_resources.item] = 183
 global.last_indices[mod_resources.perk] = 32
 global.last_indices[mod_resources.supervisor] = 11
 
-log_info("****************\nModloader start\n****************")
+log_info("****************\Forgery start\n****************")
 read_all_mods()
 
 if is_console_and_devmode_enabled()
