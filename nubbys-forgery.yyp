@@ -35,7 +35,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.13.0.190",
+    "IDEVersion":"2024.13.1.193",
   },
   "name":"nubbys-forgery",
   "resources":[
@@ -67,6 +67,7 @@
     {"id":{"name":"mod_items","path":"scripts/mod_items/mod_items.yy",},},
     {"id":{"name":"mod_perks","path":"scripts/mod_perks/mod_perks.yy",},},
     {"id":{"name":"mod_registry","path":"scripts/mod_registry/mod_registry.yy",},},
+    {"id":{"name":"mod_saving","path":"scripts/mod_saving/mod_saving.yy",},},
     {"id":{"name":"mod_scripting","path":"scripts/mod_scripting/mod_scripting.yy",},},
     {"id":{"name":"mod_sounds","path":"scripts/mod_sounds/mod_sounds.yy",},},
     {"id":{"name":"mod_sprites","path":"scripts/mod_sprites/mod_sprites.yy",},},

@@ -155,17 +155,23 @@ function load_forgery_autosave(base_data) {
 	// Game calls this twice - we only care about replacing indices once everything has loaded.
 	if (!agi("obj_LvlMGMT").GameLoaded) {
 		
-		// We gotta load the modded supervisor if there is one, since usually they are gameplay registered at the supervisors screen, which is skipped here.
+		// We need to figure out which supervisor this used to be.
+		// It should already be indexed if it exists
+		
 		var svid = real(base_data.A_SVID)
 		if svid > global.last_indices[mod_resources.supervisor] {
 			log_info("Modded supervisor detected in autosave")
 			var string_id = find_string_id_from_data(data, mod_resources.supervisor, svid);
-			var supervisor = mod_registry_get_right(global.registry, mod_resources.supervisor, string_id)
-			free_all_allocated_objects(mod_resources.supervisor)
-			clear_index_assignments(mod_resources.supervisor)
-			register_supervisor_for_gameplay(supervisor, global.last_indices[mod_resources.supervisor] + 1, string_id)
+			
+			base_data.A_SVID = mod_registries_exchange(global.registry, global.index_registry,
+				mod_resources.supervisor, string_id)
+			//free_all_allocated_objects(mod_resources.supervisor)
+			//clear_index_assignments(mod_resources.supervisor)
+			//index_supervisor(supervisor, string_id, svid)
 		}
+		
 		return;
+		
 	}
 	
 	// Load mods' save data

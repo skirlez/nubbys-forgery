@@ -6,6 +6,7 @@ g3man/base/*
 !g3man/base/mod/
 g3man/__pycache__
 g3man/frida-timestamp.txt
+g3man/*.win
 
 
 # Ignore meta folder non-script files

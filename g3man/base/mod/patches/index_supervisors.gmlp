@@ -2,4 +2,4 @@ meta:
 targets = 'gml_Object_obj_SupervisorMGMT_Create_0'
 patch:
 move_to_end()
-write('register_supervisors_for_gameplay()')
+write('index_supervisors_for_selection()')

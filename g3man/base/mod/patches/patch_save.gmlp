@@ -1,0 +1,34 @@
+// Save "Highscore" save for forgery resources
+meta:
+targets = 'gml_Object_obj_Saver_Alarm_0'
+patch:
+find_line_with('case "Highscore"')
+find_line_with('break')
+write_before('save_forgery_highscore()')
+
+
+
+// Save "Progression" save for forgery resources
+meta:
+targets = 'gml_Object_obj_Saver_Alarm_0'
+patch:
+find_line_with('case "Progression"')
+find_line_with('break')
+write_before('save_forgery_progression()')
+
+
+// Load "Highscore" save
+meta:
+targets = 'gml_Object_obj_Loader_Alarm_0'
+patch:
+find_line_with('case "Highscore"')
+find_line_with('break')
+write_before('load_forgery_highscore()')
+
+// Load "Progression" save
+meta:
+targets = 'gml_Object_obj_Loader_Alarm_0'
+patch:
+find_line_with('case "Progression"')
+find_line_with('break')
+write_before('load_forgery_progression()')

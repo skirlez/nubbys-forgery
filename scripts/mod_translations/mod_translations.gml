@@ -5,8 +5,10 @@ function load_mod_translations(wod) {
 	//var csv_files = get_all_files(trans_dir, "csv")
 	/*for (var i = 0; i < array_length(item_files); i++)*/ {
 		var file_path = trans_dir + "/en.csv";
-		var translation = load_csv(file_path)
-		ds_map_add(wod.translations, "en", translation)
+		if file_exists(file_path) {
+			var translation = load_csv(file_path)
+			ds_map_add(wod.translations, "en", translation)
+		}
 	}	
 }
 

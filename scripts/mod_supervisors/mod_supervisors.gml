@@ -73,40 +73,60 @@ function mod_register_supervisor(supervisor, supervisor_id, wod = global.cmod) {
 	bimap_set(global.registry[mod_resources.supervisor], full_id, supervisor)
 	array_push(wod.supervisors)
 	log_info($"Supervisor {full_id} registered");
-	array_push(agi("obj_GAME").U_SV, 0)
-	array_push(agi("obj_GAME").SV_HS, 0)
+	
+
+	// Supervisors must be indexed immediately. In principle resources need to be indexed
+	// whenever the management object is actually created, and in the case of supervisors,
+	// obj_GAME partially does this (storing highscores, wins, and whether or not you unlocked them)
+	
+	// also for some unknown reason 12 is reserved, we can't just skip to 13 otherwise the selection
+	// screen gets confused, so we do this.
+	var index = global.last_indices[mod_resources.supervisor] 
+		+ bimap_size(global.index_registry[mod_resources.supervisor])
+		+ 1
+	index_supervisor(supervisor, full_id, index)
+	
 	return supervisor;
 }
 
 
 // Called from gml_Object_obj_SupervisorMGMT_Create_0
-function register_supervisors_for_gameplay() {
-	free_all_allocated_objects(mod_resources.supervisor)
-	clear_index_assignments(mod_resources.supervisor)
-	var supervisor_ids = bimap_lefts_array(global.registry[mod_resources.supervisor])
-	for (var i = 0; i < array_length(supervisor_ids); i++) {		
+function index_supervisors_for_selection() {
+	var supervisor_indices = bimap_lefts_array(global.index_registry[mod_resources.supervisor])
+	for (var i = 0; i < array_length(supervisor_indices); i++) {
+		var index = supervisor_indices[i]
 		with (agi("obj_SupervisorMGMT")) {
-			var supervisor = bimap_get_right(global.registry[mod_resources.supervisor], supervisor_ids[i])
-			var supervisor_index = array_length(SuperVisorName)
-
-			SuperVisorName[supervisor_index] = agi("scr_Text")(supervisor.display_name);
-			SuperVisorDesc[supervisor_index] = agi("scr_Text")(supervisor.description, "\n");
-			SVSprite[supervisor_index] = supervisor.sprites.preview;
-			SuperVisorCol1[supervisor_index] = supervisor.name_color;
-			SuperVisorCol2[supervisor_index] = 255; // Unused as of now
-			SVCost[supervisor_index] = supervisor.cost;
-			SVGoAud[supervisor_index] = supervisor.go_sound;
-			SVSpriteClick[supervisor_index] = supervisor.sprites.preview_clicked;
+			var supervisor = bimap_get_right(global.index_registry[mod_resources.supervisor], index)
+			
+			SuperVisorName[index] = agi("scr_Text")(supervisor.display_name);
+			SuperVisorDesc[index] = agi("scr_Text")(supervisor.description, "\n");
+			SVSprite[index] = supervisor.sprites.preview;
+			SuperVisorCol1[index] = supervisor.name_color;
+			SuperVisorCol2[index] = 255; // Unused as of now
+			SVCost[index] = supervisor.cost;
+			SVGoAud[index] = supervisor.go_sound;
+			SVSpriteClick[index] = supervisor.sprites.preview_clicked;
+			
+			var string_id = mod_registries_exchange(global.index_registry, global.registry, mod_resources.supervisor, index)
+			log_info($"Supervisor {string_id} has been indexed for selection screen: {index}")
 				
-			register_supervisor_for_gameplay(supervisor, supervisor_index, supervisor_ids[i])
 		}
 	}
 }
-function register_supervisor_for_gameplay(supervisor, index, string_id) {
+function index_supervisor(supervisor, string_id, index) {
 	var obj = allocate_object(mod_resources.supervisor, supervisor)
 	// TODO. use a map for this.
 	supervisor.__object = obj;
 	assign_index_to_resource(mod_resources.supervisor, supervisor, index)
+	
+	// these are later overriden by your progress and highscore save,
+	// if you have any.
+	with (agi("obj_GAME")) {
+		U_SV[index] = 0
+		SvWins[index] = 0
+		SV_HS[index] = 0;
+	}
+	
 	log_info($"Supervisor {string_id} has been indexed: {index}")
 }
 

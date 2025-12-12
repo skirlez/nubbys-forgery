@@ -10,6 +10,14 @@ if keyboard_check_pressed(ord("R")) && room == agi("Roo_TitleMenu") {
 	clear_all_mods();
 	read_all_mods();
 	room_restart(); // So that the load autosave button rereads the file
+	
+	// reload some saves (needed for supervisors)
+	agi("scr_LoadData")("Progression")
+	agi("scr_LoadData")("Highscore")
+	
+	with (agi("obj_Loader")) {
+		persistent = true;	
+	}
 }
 if keyboard_check_pressed(ord("H")) {
 	log_info("H Pressed - Hot-reloading all code. This probably doesn't do what you think it does right now.")

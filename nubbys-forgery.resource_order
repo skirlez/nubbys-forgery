@@ -46,6 +46,7 @@
     {"name":"mod_items","order":11,"path":"scripts/mod_items/mod_items.yy",},
     {"name":"mod_perks","order":15,"path":"scripts/mod_perks/mod_perks.yy",},
     {"name":"mod_registry","order":20,"path":"scripts/mod_registry/mod_registry.yy",},
+    {"name":"mod_saving","order":24,"path":"scripts/mod_saving/mod_saving.yy",},
     {"name":"mod_scripting","order":6,"path":"scripts/mod_scripting/mod_scripting.yy",},
     {"name":"mod_sounds","order":21,"path":"scripts/mod_sounds/mod_sounds.yy",},
     {"name":"mod_sprites","order":13,"path":"scripts/mod_sprites/mod_sprites.yy",},

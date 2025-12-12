@@ -19,7 +19,7 @@ global.last_indices[mod_resources.item] = 183
 global.last_indices[mod_resources.perk] = 32
 global.last_indices[mod_resources.supervisor] = 11
 
-log_info("****************\Forgery start\n****************")
+log_info("****************\Forgery start****************")
 read_all_mods()
 
 if is_console_and_devmode_enabled()
@@ -55,3 +55,4 @@ function iterate_run_delayed() {
 		}
 	}
 }
+
