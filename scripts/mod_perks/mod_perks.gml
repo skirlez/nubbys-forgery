@@ -32,7 +32,13 @@ function mod_register_perk(perk, perk_id, wod = global.cmod) {
 			+ "\nThe perk is not registered.")
 			
 		return;
-	}	
+	}
+	
+	static optional_variables = {
+		manage_own_trigger : false,
+	}
+	initialize_missing(perk, optional_variables)
+	
 
 	var full_id = $"{wod.mod_id}:{perk_id}"
 	bimap_set(global.registry[mod_resources.perk], full_id, perk)

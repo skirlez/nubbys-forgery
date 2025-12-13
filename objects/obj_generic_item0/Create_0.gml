@@ -45,7 +45,7 @@ if (ItemLevel == 1)
 MyItemBacker = -1
 global.cmod = mod_of_origin;
 try {
-	execute(item.on_create, id)
+	execute(item.on_trigger, id, id)
 }
 catch (e) {
 	log_error($"Item {string_id} errored on creation: {pretty_error(e)}")

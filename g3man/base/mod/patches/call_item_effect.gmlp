@@ -1,0 +1,12 @@
+meta:
+targets = {'gml_GlobalScript_scr_L1_ItemEffect', 'gml_GlobalScript_scr_L2_ItemEffect'}
+patch:
+
+// This patch modifies both of the scripts above, so their default case goes to modded items
+find_line_with('switch (arg0)')
+move(1)
+write('
+default:
+	forgery_modded_item_effect(arg0)
+	break;
+')

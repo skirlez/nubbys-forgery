@@ -27,7 +27,7 @@ WhatSlot = -1
 
 global.cmod = mod_of_origin;
 try {
-	execute(perk.on_create, id)
+	execute(perk.on_create, id, id)
 }
 catch (e) {
 	log_error($"Perk {string_id} errored on creation: {pretty_error(e)}")

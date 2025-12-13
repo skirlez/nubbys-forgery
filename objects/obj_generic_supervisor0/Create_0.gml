@@ -22,7 +22,7 @@ mod_of_origin = ds_map_find_value(global.mod_id_to_mod_map, mod_identifier_get_n
 
 global.cmod = mod_of_origin;
 try {
-	execute(supervisor.on_create, id)
+	execute(supervisor.on_create, id, id)
 }
 catch (e) {
 	log_error($"Supervisor {string_id} errored on creation: {pretty_error(e)}")

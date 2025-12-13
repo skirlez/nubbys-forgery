@@ -43,6 +43,7 @@ function mod_register_item(item, item_id, wod = global.cmod) {
 	static optional_variables = {
 		on_step : noone,
 		on_round_init : noone,
+		manage_own_trigger : false,
 	}
 	initialize_missing(item, optional_variables)
 	
@@ -117,3 +118,21 @@ function register_items_for_gameplay() {
 	}
 }
 
+// called from gml_GlobalScript_scr_L1_ItemEffect and gml_GlobalScript_scr_L2_ItemEffect
+function forgery_modded_item_effect(index) {
+	var item = mod_registry_get_right(global.index_registry, mod_resources.item, index)
+	if item == undefined {
+		log_warn($"Game tried to perform item effect of item with index {index}, which does not exist")
+		return;	
+	}
+	var string_id = mod_registry_get_left(global.registry, mod_resources.item, item)
+	var previous_mod = global.cmod
+	global.cmod = ds_map_find_value(global.mod_id_to_mod_map, mod_identifier_get_namespace(string_id))
+	try {
+		execute(item.on_trigger, id, id)
+	}
+	catch (e) {
+		log_error($"Item {string_id} errored on trigger: {pretty_error(e)}")
+	}
+	global.cmod = previous_mod;
+}

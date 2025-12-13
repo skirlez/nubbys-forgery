@@ -73,7 +73,6 @@ function load_forgery_highscore() {
 			continue; // shouldn't happen	
 		with (agi("obj_GAME")) {
 			if array_contains(string_ids_in_save, string_id) {
-				log_info($"Found already loaded supervisor {string_id} with values in highscore")
 				SV_HS[index] = s[$ string_id].highscore
 			}
 			else {
@@ -97,7 +96,6 @@ function load_forgery_progression() {
 			continue; // shouldn't happen	
 		with (agi("obj_GAME")) {
 			if array_contains(string_ids_in_save, string_id) {
-				log_info($"Found already loaded supervisor {string_id} with values in highscore")
 				SvWins[index] = s[$ string_id].wins
 				U_SV[index] = s[$ string_id].unlocked
 			}

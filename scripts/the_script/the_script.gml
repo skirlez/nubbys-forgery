@@ -361,7 +361,6 @@ function read_all_mods() {
 	}
 }
 
-
 function is_console_and_devmode_enabled() {
 	return true;	
 }

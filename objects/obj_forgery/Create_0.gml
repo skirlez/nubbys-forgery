@@ -29,8 +29,8 @@ if is_console_and_devmode_enabled()
 global.CursTar = -1
 
 run_delayed = [];
-function add_to_run_delayed(frames, func, wod) {
-	array_push(run_delayed, { time : frames, func : func, mod_of_origin : wod })
+function add_to_run_delayed(frames, args, func, wod) {
+	array_push(run_delayed, { time : frames, args : args, func : func, mod_of_origin : wod })
 }
 function remove_mod_from_run_delayed(wod) {
 	var len = array_length(run_delayed);
@@ -48,7 +48,7 @@ function iterate_run_delayed() {
 		var struct = run_delayed[i];
 		struct.time--;
 		if struct.time <= 0 {
-			struct.func();
+			struct.func(struct.args);
 			array_delete(run_delayed, i, 1)
 			len--;
 			i--;
