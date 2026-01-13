@@ -24,9 +24,6 @@ function mod_register_item(item, item_id, wod = global.cmod) {
 		pool : 0,
 		offset_price : 0,
 		pair_id : "",
-		odds_weight_early : 0,
-		odds_weight_mid : 0,
-		odds_weight_end : 0,
 		on_create : global.empty_method,
 		on_trigger : global.empty_method,
 	}
@@ -41,18 +38,38 @@ function mod_register_item(item, item_id, wod = global.cmod) {
 	}
 	
 	static optional_variables = {
-		on_step : noone,
-		on_round_init : noone,
+		on_step : global.empty_method,
+		on_round_init : global.empty_method,
 		manage_own_trigger : false,
+		food_crumb_colors : [c_white, c_white],
+		food : false,
+		odds_weight_early : 5,
+		odds_weight_mid : 5,
+		odds_weight_end : 5,
 	}
+	var compliance = get_struct_compliance_with_contract(item, optional_variables)
+	if array_length(compliance.mismatched_types) > 0 {
+		compliance.missing = [];
+		log_error($"Item {item_id} from {wod.mod_id} has bad variables!\n" 
+			+ generate_compliance_error_text(item, item_contract, compliance)
+			+ "\nThe item is not registered.")
+		return;
+	}
+
 	initialize_missing(item, optional_variables)
+	
+	if array_length(item.food_crumb_colors != 2) || !is_numeric(item.food_crumb_colors[0]) || !is_numeric(item.food_crumb_colors[1]) {
+		log_error($"Item {item_id} from {wod.mod_id} has bad variables!\n"
+		+ "If you are registering a food item, the \"food_crumb_colors\" array MUST have exactly two color values.")
+		return;
+	}
 	
 	var full_id = $"{wod.mod_id}:{item_id}"
 	
 	bimap_set(global.registry[mod_resources.item], full_id, item)
 	array_push(wod.items, item)
 	
-	log_info($"Item {full_id} registered");
+	log_info($"Item {full_id} registered {item.game_event == "Eat" ? "(as food)" : ""}");
 	return item;
 }
 
@@ -77,7 +94,7 @@ function register_items_for_gameplay() {
 			agi("scr_Text")(item.display_name),
 			obj,
 			item.level,
-			0, // previously item.type. It's all 0 for items 
+			item.food,
 			item.tier, 
 			item.augment,
 			item.effect, 

@@ -63,7 +63,6 @@ function create_mod(mod_folder_name) {
 	}
 	
 	var entrypoint = wod.custom.forgery.entrypoint;
-	
 	global.cmod = wod;
 	if entrypoint.type == "runtime" {
 		static entrypoint_runtime_contract = {
@@ -104,7 +103,7 @@ function create_mod(mod_folder_name) {
 			on_load : "",
 			on_unload : ""
 		}
-		var entrypoint_compiled_compliance = get_struct_compliance_with_contract(entrypoint, entrypoint_runtime_contract)
+		var entrypoint_compiled_compliance = get_struct_compliance_with_contract(entrypoint, entrypoint_compiled_contract)
 		if is_discompilant(entrypoint_compiled_compliance) {
 			return compliance_error(wod, entrypoint_compiled_contract, entrypoint_compiled_compliance,
 				$"mod.json in {mod_folder_name} has bad entrypoint variables")
@@ -309,8 +308,7 @@ function unload_mod(wod) {
 	ds_map_destroy(wod.code_files)
 	
 	ds_map_destroy(wod.functions)
-	
-	remove_mod_from_run_delayed(wod)
+	agi("obj_forgery").remove_mod_from_run_delayed(wod)
 	
 	ds_map_delete(global.mod_id_to_mod_map, wod.mod_id);
 }
@@ -386,7 +384,7 @@ function hot_reload() {
 	}
 }
 function get_nf_version_string() {
-	return "Nubby's Forgery BETA V5"	
+	return "Nubby's Forgery BETA V6"	
 }
 function get_nf_loaded_string() {
 	return $"({ds_map_size(global.mod_id_to_mod_map)} mod(s) loaded, "

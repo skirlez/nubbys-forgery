@@ -63,6 +63,7 @@ function initialize_missing(struct, optional_struct) {
 		var variable_name = arr[i];
 		if !variable_struct_exists(struct, variable_name)
 			struct[$ variable_name] = optional_struct[$ variable_name]
+		// TODO check for mismatched types
 	}
 }
 

@@ -7,14 +7,20 @@ Nubby's Forgery is a [g3man](https://github.com/skirlez/g3man/) mod.
 Pick the version you want in https://github.com/Skirlez/nubbys-forgery/releases, and follow the instructions written with it.
 
 ## Making a mod that utilizes on Forgery
-An up-to-date example mod, with various trinkets I have implemented, is
-available at https://github.com/Skirlez/nubbys-forgery-example-mod. It has plenty of comments to help you.
+Forgery has two example mods that you can look at.
+
+The first has an item, supervisor, and perk: https://github.com/Skirlez/nubbys-forgery-example-mod
+
+The second just has one item: https://github.com/Skirlez/nubbys-forgery-example-mod-2
+
+The first mod has no GameMaker project and adds all of its functionality with the Catspeak scripting language, while the second mod has a GameMaker project, and all of its code an assets are included in it.
 
 Additionally: See the [Forgery wiki](https://github.com/Skirlez/nubbys-forgery/wiki)!
 
 ## Status
 Below is a list of what I want the API to support with a tick with what's implemented.
 - [x] Items
+- [x] Food
 - [x] Perks
 - [x] Supervisors
 - [ ] Challenges

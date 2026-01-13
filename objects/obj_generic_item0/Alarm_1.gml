@@ -1,4 +1,4 @@
-if item.on_round_init == noone
+if item.on_round_init == global.empty_method
 	return;
 global.cmod = mod_of_origin;
 try {

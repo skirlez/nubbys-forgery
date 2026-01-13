@@ -8,17 +8,26 @@ if item.manage_own_trigger == true {
 	}
 	return;	
 }
-
-if (DisableItem == false && global.GameMode == 1) {
-	if ItemLevel == 0 {
-		agi("scr_L1_ItemEffect")(MyItemID)
+if item.food {
+	switch (ds_list_find_value(ItemQueue, 0)) {
+		case 1:
+			if ItemLevel == 0
+				agi("scr_FoodEffect")(MyItemID)
+			else
+				agi("scr_UpgrFoodEffect")(MyItemID)
+			instance_destroy()
+		    break
 	}
-	else {
-		agi("scr_L2_ItemEffect")(MyItemID)
-	}
-    agi("scr_FX_ItemFire")(agi("au_ItemFireGrl"));
-    agi("scr_TrackFire")();
-    agi("scr_PositionalEv")();
 }
-
-agi("scr_ItemQueue")();
+else {
+	if DisableItem == false && global.GameMode == 1 {
+		if ItemLevel == 0
+			agi("scr_L1_ItemEffect")(MyItemID)
+		else
+			agi("scr_L2_ItemEffect")(MyItemID)
+		agi("scr_FX_ItemFire")(agi("au_ItemFireGrl"));
+		agi("scr_TrackFire")();
+		agi("scr_PositionalEv")();
+	}
+	agi("scr_ItemQueue")();
+}

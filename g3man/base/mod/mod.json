@@ -5,8 +5,8 @@
     "icon_path" : "",
     "credits" : ["skirlez"],
     "version" : "1.0.0",
-    "target_game_version" : "V1.34",
-    "target_patcher_version" : "1",
+    "target_game_version" : "v1.4.2",
+    "target_patcher_version" : "5",
     "depends" : [],
     "breaks" : [],
 

@@ -14,6 +14,11 @@ global.sprite_count = 0;
 while (sprite_exists(global.sprite_count))
 	global.sprite_count++;
 
+
+// Unfortunately this must be hardcoded for now...
+// Nubby resources are each created in their own object, that only exists during gameplay.
+// The only way to find how long the resource arrays are would be is to create them and check,
+// and I don't want to. But actually that may be worth looking into.
 global.last_indices = array_create(mod_resources.size)
 global.last_indices[mod_resources.item] = 183
 global.last_indices[mod_resources.perk] = 32

@@ -1,5 +1,5 @@
 meta:
-targets = {'gml_GlobalScript_scr_L1_ItemEffect', 'gml_GlobalScript_scr_L2_ItemEffect'}
+targets = {'gml_GlobalScript_scr_L1_ItemEffect', 'gml_GlobalScript_scr_L2_ItemEffect', 'gml_GlobalScript_scr_FoodEffect', 'gml_GlobalScript_scr_UpgrFoodEffect'}
 patch:
 
 // This patch modifies both of the scripts above, so their default case goes to modded items

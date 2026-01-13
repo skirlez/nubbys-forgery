@@ -42,12 +42,20 @@ ItemLevel = item.level - 1 // This is actually set manually for items, seemingly
 if (ItemLevel == 1)
     alarm_set(6, 1)
 
+
+if (item.food) {
+	RespawnFood = 0
+	CrumbFxCol1 = item.food_crumb_colors[0]
+	CrumbFxCol2 = item.food_crumb_colors[1]
+}
+
 MyItemBacker = -1
 global.cmod = mod_of_origin;
 try {
-	execute(item.on_trigger, id, id)
+	execute(item.on_create, id, id)
 }
 catch (e) {
 	log_error($"Item {string_id} errored on creation: {pretty_error(e)}")
 	// TODO disable item
 }
+

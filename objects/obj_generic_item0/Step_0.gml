@@ -1,4 +1,4 @@
-if item.on_step == noone
+if item.on_step == global.empty_method
 	return;
 global.cmod = mod_of_origin;
 try {
