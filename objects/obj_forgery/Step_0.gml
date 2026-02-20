@@ -11,6 +11,8 @@ if keyboard_check_pressed(ord("R")) && room == agi("Roo_TitleMenu") {
 	read_all_mods();
 	room_restart(); // So that the load autosave button rereads the file
 	
+	agi("scr_InitTranslations")()
+	
 	// reload some saves (needed for supervisors)
 	agi("scr_LoadData")("Progression")
 	agi("scr_LoadData")("Highscore")
