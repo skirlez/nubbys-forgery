@@ -9,9 +9,9 @@ function initialize_catspeak() {
 }
 
 function expose_constants(interface) {
-	interface.exposeConstant("mod_resource_item", mod_resources.item)
-	interface.exposeConstant("mod_resource_perk", mod_resources.perk)
-	interface.exposeConstant("mod_resource_supervisor", mod_resources.supervisor)
+	interface.exposeDynamicConstant("forgery", function() {
+		return global.forgery_7
+	});
 }
 
 

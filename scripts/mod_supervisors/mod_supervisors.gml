@@ -178,7 +178,3 @@ function on_supervisor_preview_choose_clicked_audio() {
 	else
 		SVCurrentAu = agi("snd_silence")
 }
-
-function mod_get_current_supervisor_string_id(instance) {
-	
-}

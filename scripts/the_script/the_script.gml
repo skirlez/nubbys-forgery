@@ -34,9 +34,11 @@ function create_mod(mod_folder_name) {
 		credits : [],
 		custom : {
 			forgery : {
-				entrypoint : { type : ""},
+				entrypoint_type : "",
+				entrypoint : {},
 				translations_path : "",
-				compile_all_code_on_load : false
+				compile_all_code_on_load : false,
+				target_version : 0
 			}
 		},
 	}
@@ -62,11 +64,11 @@ function create_mod(mod_folder_name) {
 		compile_all_files_in_path_recursively("/", wod, wod.code_files)
 	}
 	
-	var entrypoint = wod.custom.forgery.entrypoint;
+	var entrypoint_type = wod.custom.forgery.entrypoint_type;
+	var entrypoint = wod.custom.forgery.entrypoint
 	global.cmod = wod;
-	if entrypoint.type == "runtime" {
+	if entrypoint_type == "runtime" {
 		static entrypoint_runtime_contract = {
-			type : "",
 			path : "",
 		}
 		var entrypoint_runtime_compliance = get_struct_compliance_with_contract(entrypoint, entrypoint_runtime_contract)
@@ -97,9 +99,8 @@ function create_mod(mod_folder_name) {
 		wod.on_load = mod_globals.on_load;
 		wod.on_unload = mod_globals.on_unload;
 	}
-	else if entrypoint.type == "compiled" {
+	else if entrypoint_type == "compiled" {
 		static entrypoint_compiled_contract = {
-			type : "",
 			on_load : "",
 			on_unload : ""
 		}
@@ -111,13 +112,19 @@ function create_mod(mod_folder_name) {
 		wod.on_load = agi(entrypoint.on_load);
 		wod.on_unload = agi(entrypoint.on_unload);
 	}
-	else {
+	else if entrypoint_type != "none" {
 		return new result_error(new generic_error(
 			$"mod.json in {mod_folder_name} has invalid entrypoint type: {entrypoint.type}\n"
-			+ "(valid: \"runtime\", \"compiled\")"
+			+ "(valid: \"catspeak\", \"compiled\", \"none\")"
 		))	
 	}
 	
+	if wod.target_version != 7 {
+		return new result_error(new generic_error(
+			$"mod.json in {mod_folder_name} requests a non-existent API version: {wod.target_version}\n"
+			+ "(the only possible target_version at the moment is 7)"
+		))		
+	}
 	
 	wod.items = []
 	wod.perks = []

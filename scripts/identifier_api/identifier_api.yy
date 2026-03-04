@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"identifier",
+  "%Name":"identifier_api",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"identifier",
+  "name":"identifier_api",
   "parent":{
     "name":"Scripts",
     "path":"folders/Scripts.yy",

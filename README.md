@@ -1,7 +1,7 @@
 # Nubby's Forgery
 Nubby's Forgery is an API for Nubby's Number Factory. It allows you to extend various game systems, including items, perks, and supervisors.
 
-If you use it, you don't have to focus on the implementation details of how your content is put into the game - or even more boring stuff, like saving and autosaving while working with other mods - Forgery handles all of those, correctly, for you.
+If you use it, you don't have to focus on the implementation details of how your content is put into the game - or even more boring stuff, like saving and autosaving while working with other mods - it handles all of these for you.
 
 Nubby's Forgery is a [g3man](https://github.com/skirlez/g3man/) mod.
 

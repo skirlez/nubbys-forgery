@@ -1,0 +1,33 @@
+{
+	// Path to the folder with this mod's GameMaker project.
+	// If this mod has no GameMaker project, leaving this as blank
+	// will disable GameMaker project building.
+	// This path should be a relative path.
+	// Relative paths, e.g. "src" means "the src folder present inside this folder", or
+	// ".." meaning "the folder above this one
+	"gamemaker_project_path": "..",
+	
+	// The GameMaker runtime this project should be built for.
+	// Example: "2023.4.0.113"
+	"gamemaker_runtime_version": "2024.13.1.242",
+	
+	// The GameMaker configuration to use. If you don't know what this is, leave as "Default".
+	"gamemaker_configuration": "Default",
+	
+	// Dependencies that frida should fetch and build.
+	"dependencies": [],
+	
+	// Where Frida should place the datafile when packaging.
+	"target_mod_datafile_location": "out/forgery/mod_data.win",
+	
+	// In what order to process the mods in the "base" folder.
+	"mod_order" : ["forgery"],
+	
+	// Should the output profile set to use a separate save file folder. Leaving this as blank will use the same save folder as the vanilla game,
+	// changing this will change the folder.
+	"modded_save_name" : "",
+	
+	// This number is used for potential auto-upgrading of this file,
+	// and you shouldn't change it.
+	"format_version": 1
+}

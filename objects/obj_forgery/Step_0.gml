@@ -11,6 +11,8 @@ if keyboard_check_pressed(ord("R")) && room == agi("Roo_TitleMenu") {
 	read_all_mods();
 	room_restart(); // So that the load autosave button rereads the file
 	
+	ds_map_destroy(global.Translations)
+	ds_grid_destroy(global.LocData)
 	agi("scr_InitTranslations")()
 	
 	// reload some saves (needed for supervisors)

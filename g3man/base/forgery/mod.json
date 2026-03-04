@@ -6,10 +6,11 @@
     "credits" : ["skirlez"],
     "version" : "1.0.0",
     "target_game_version" : "v1.4.2",
-    "target_patcher_version" : "5",
+    "target_patcher_version" : "6",
     "depends" : [],
     "breaks" : [],
 
+    "mangle" : [ "" ],
     "patches" : [
         {
             "path" : "patches",

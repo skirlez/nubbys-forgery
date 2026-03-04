@@ -15,7 +15,7 @@ function mod_get_path(path, warn = true, wod = global.cmod) {
 	return full_path;
 }
 
-function mod_register_function(name, func, wod = global.cmod) {
+function mod_register_function_catspeak(name, func, wod = global.cmod) {
 	// TODO check name and whatnot
 	ds_map_set(wod.functions, name, func)
 }
