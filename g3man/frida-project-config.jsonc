@@ -14,14 +14,25 @@
 	// The GameMaker configuration to use. If you don't know what this is, leave as "Default".
 	"gamemaker_configuration": "Default",
 	
+	// Where Frida should place the datafile when packaging.
+	"gamemaker_datafile_export_path": "out/forgery/mod_data.win",
+	
+	// Where Frida should place Included Files when packaging.
+	"gamemaker_included_files_export_path": "",
+	
 	// Dependencies that frida should fetch and build.
 	"dependencies": [],
 	
-	// Where Frida should place the datafile when packaging.
-	"target_mod_datafile_location": "out/forgery/mod_data.win",
+	// Evaluate dependencies of dependencies
+	// If this is disabled, you have to manually specify all the dependencies of your dependencies.
+	"recursive_dependencies" : true,
 	
-	// In what order to process the mods in the "base" folder.
+	// Mod priority for the testing profile (used by \"frida.py apply\".). You should put the ID
+	// your mod and its dependencies here. Earlier in the list means higher priority.
 	"mod_order" : ["forgery"],
+	
+	// Which files and folders inside "out" should not be zipped when using `frida.py package --zip`.
+	"zip_exclude" : ["profile.json"],
 	
 	// Should the output profile set to use a separate save file folder. Leaving this as blank will use the same save folder as the vanilla game,
 	// changing this will change the folder.

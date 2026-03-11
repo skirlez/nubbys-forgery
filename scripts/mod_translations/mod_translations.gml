@@ -17,7 +17,9 @@ function get_current_language_id() {
 		case 0:
 			return "en"
 		case 1:
-			return "pt-BR";
+			return "pt-BR"
+		case 2:
+			return "da"
 	}
 }
 
@@ -68,13 +70,14 @@ function append_translations(loc_data) {
 		
 		ds_map_set(global.Translations, key, line)
 		ds_grid_set(global.LocData, 0, line, key)
+		var empty = ""
 		if global.Localization == 0 {
 			ds_grid_set(global.LocData, 1, line, ds_grid_get(loc_data, 1, i))
-			ds_grid_set(global.LocData, 2, line, "")
+			ds_grid_set(global.LocData, 2, line, empty)
 		}
 		else {
 			// I'm not sure what the idea is here
-			ds_grid_set(global.LocData, 1, line, "")
+			ds_grid_set(global.LocData, 1, line, empty)
 			ds_grid_set(global.LocData, 2, line, ds_grid_get(loc_data, 1, i))
 		}
 	}	

@@ -198,7 +198,9 @@ function load_forgery_autosave(base_data) {
 	
 
 	var fields_list_map = array_create(mod_resources.size, []);
-	fields_list_map[mod_resources.item] = ["A_Items", "A_FrozenItems", "A_ShopItems", "A_CafeItems", "A_BMItems"]
+	fields_list_map[mod_resources.item] = ["A_Items", "A_FrozenItems", "A_ShopItems",
+											"A_CafeItems", "A_BMItems", "A_LastFoodEaten",
+											"A_LastItemPurchased"]
 	fields_list_map[mod_resources.perk] = ["A_Perks"]
 	fields_list_map[mod_resources.supervisor] = ["A_SVID"]
 	for (var resource = 0; resource < mod_resources.size; resource++) {

@@ -147,6 +147,11 @@ function forgery_modded_item_effect(index) {
 	global.cmod = ds_map_find_value(global.mod_id_to_mod_map, mod_identifier_get_namespace(string_id))
 	try {
 		execute(item.on_trigger, id, id)
+		if (!item.manage_own_trigger) {
+			agi("obj_ItemMGMT").RecentEatenFoodDisp = agi("obj_ItemMGMT").ItemID[index];
+			agi("obj_ItemMGMT").RecentEatenFoodDispID = index;
+			agi("obj_ItemMGMT").RecentEatenFood = index;	
+		}
 	}
 	catch (e) {
 		log_error($"Item {string_id} errored on trigger: {pretty_error(e)}")

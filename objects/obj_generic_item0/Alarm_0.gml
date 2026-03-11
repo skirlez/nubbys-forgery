@@ -16,7 +16,7 @@ if item.food {
 			else
 				agi("scr_UpgrFoodEffect")(MyItemID)
 			instance_destroy()
-		    break
+			break
 	}
 }
 else {

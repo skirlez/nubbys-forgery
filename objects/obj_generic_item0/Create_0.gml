@@ -21,7 +21,7 @@ EvType = agi("obj_ItemMGMT").ItemTrig[MyItemID]
 EvTypeAlt = "Empty"
 EvTypeExt = "Empty"
 if instance_exists(agi("obj_SV4Manager")) {
-    EvTypeAlt = agi("obj_ItemMGMT").MutantTrig[MyItemID]
+	EvTypeAlt = agi("obj_ItemMGMT").MutantTrig[MyItemID]
 }
 MyDesc = -1
 //ItemLevel = 1
@@ -40,7 +40,7 @@ RoundsAlive = 0
 
 ItemLevel = item.level - 1 // This is actually set manually for items, seemingly. Automated here.
 if (ItemLevel == 1)
-    alarm_set(6, 1)
+	alarm_set(6, 1)
 
 
 if (item.food) {

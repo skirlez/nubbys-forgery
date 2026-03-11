@@ -1,5 +1,6 @@
 // Everything used to be in this script. Then I put things in other scripts.
 #macro agi asset_get_index
+#macro g3man global.g3man_6
 
 function create_mod(mod_folder_name) {
 	var mod_definition_file = file_text_open_read($"{global.mods_directory}/{mod_folder_name}/mod.json")
@@ -119,9 +120,9 @@ function create_mod(mod_folder_name) {
 		))	
 	}
 	
-	if wod.target_version != 7 {
+	if wod.custom.forgery.target_version != 7 {
 		return new result_error(new generic_error(
-			$"mod.json in {mod_folder_name} requests a non-existent API version: {wod.target_version}\n"
+			$"mod.json in {mod_folder_name} requests a non-existent API version: {wod.custom.forgery.target_version}\n"
 			+ "(the only possible target_version at the moment is 7)"
 		))		
 	}
@@ -339,6 +340,10 @@ function read_all_mods() {
 	var folders = get_all_directories(global.mods_directory)
 	for (var i = 0; i < array_length(folders); i++) {
 		var mod_folder_name = folders[i];
+		if variable_global_exists("g3man_6") {
+			if array_contains(global.g3man_6.disabled_mods, mod_folder_name)
+				continue;
+		}
 		var mod_result = create_mod(mod_folder_name)
 		if (mod_result.is_error()) {
 			log_error(mod_result.error.text)
@@ -391,7 +396,7 @@ function hot_reload() {
 	}
 }
 function get_nf_version_string() {
-	return "Nubby's Forgery BETA V6"	
+	return "Nubby's Forgery BETA V7"	
 }
 function get_nf_loaded_string() {
 	return $"({ds_map_size(global.mod_id_to_mod_map)} mod(s) loaded, "

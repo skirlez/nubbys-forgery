@@ -25,10 +25,9 @@ Below is a list of what I want the API to support with a tick with what's implem
 - [x] Food
 - [x] Perks
 - [x] Supervisors
+- [ ] Nubby/Item Skins
 - [ ] Challenges
 - [ ] Special/Boss Rounds
-- [x] Sprite management
-- [x] Audio management
 - [x] Translations
 - [x] Scripting via Catspeak
 - [ ] Scripting via Lua (?)

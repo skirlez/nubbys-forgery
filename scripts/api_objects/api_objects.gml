@@ -1,6 +1,6 @@
 
 function create_api_objects() {
-	global.forgery_7 = {
+	global.forgery_7 = fixup({
 		register_item : mod_register_item,
 		register_perk : mod_register_perk,
 		register_supervisor : mod_register_supervisor,
@@ -40,5 +40,19 @@ function create_api_objects() {
 			perk : mod_resources.perk,
 			supervisor : mod_resources.supervisor
 		}
-	};
+	});
+	
+}
+
+function fixup(struct) {
+	var arr = struct_get_names(struct)
+	for (var i = 0; i < array_length(arr); i++) {
+		var variable_name = arr[i];
+		var value = struct[$ variable_name]
+		if typeof(value) == "struct"
+			struct[$ variable_name] = fixup(value)
+		if typeof(value) == "ref" && is_callable(value) && !is_method(value)
+			struct[$ variable_name] = method(undefined, value)
+	}
+	return struct
 }

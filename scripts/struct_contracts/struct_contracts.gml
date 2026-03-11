@@ -26,11 +26,10 @@ function get_struct_compliance_with_contract(struct, contract_struct) {
 			if (typeof(struct[$ variable_name]) == "struct") {
 				var subcompliance = get_struct_compliance_with_contract(
 					struct[$ variable_name], contract_struct[$ variable_name])
-					
 				for (var j = 0; j < array_length(subcompliance.missing); j++)
-					array_push(compliance.missing, $"{variable_name}.{subcompliance.missing[i]}")
+					array_push(compliance.missing, $"{variable_name}.{subcompliance.missing[j]}")
 				for (var j = 0; j < array_length(subcompliance.mismatched_types); j++)
-					array_push(compliance.mismatched_types, $"{variable_name}.{subcompliance.mismatched_types[i]}")
+					array_push(compliance.mismatched_types, $"{variable_name}.{subcompliance.mismatched_types[j]}")
 			}
 		}
 	}

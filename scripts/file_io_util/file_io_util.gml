@@ -29,7 +29,7 @@ function remove_file_extension(name) {
 	return arr[0]
 }
 function get_file_extension(name) {
-	var arr = string_split(name, ".", true)
+	var arr = string_split(name, ".", true, 1)
 	if array_length(arr) == 0
 		return ""
 	return arr[array_length(arr) - 1];
