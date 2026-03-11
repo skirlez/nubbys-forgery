@@ -50,8 +50,9 @@ def path_explore_downwards(path: str, amount: int) -> str:
 	if amount <= 0:
 		return path
 	ls = os.listdir(path)
-	if len(ls) == 1 and os.path.isdir(ls[0]):
-		return path_explore_downwards(f"{path}/{ls[0]}", amount - 1)
+	combined = f"{path}/{ls[0]}"
+	if len(ls) == 1 and os.path.isdir(combined):
+		return path_explore_downwards(combined, amount - 1)
 	# not sure what to do in this case
 	return path
 		
@@ -694,7 +695,8 @@ frida_template_project_config = """
 // 
 // You *can* use backslashes when filling out paths, but they must be escaped, i.e. you have to write "\\" instead of "\" every time.
 // Save yourself the hassle and use forward slashes.
-
+//
+// Frida wiki entry: https://github.com/skirlez/frida/wiki/Project-Config
 {
 	// Path to the folder with this mod's GameMaker project.
 	// If this mod has no GameMaker project, leaving this as blank
@@ -720,7 +722,7 @@ frida_template_project_config = """
 	// Dependencies that frida should fetch and build.
 	// These can be local paths if you start the string with \"path:\"
 	// or a link to a GitHub repository (with "github:user/repo/branch" or "github-tag:user/repo")
-	// For more information, see TODO
+	// For more information, see https://github.com/skirlez/frida/wiki/Dependency-Management
 	"dependencies": [],
 	
 	// Evaluate dependencies of dependencies
@@ -837,7 +839,7 @@ def validate_project_dict(frida_root, dict):
 		warnings.append(f"gamemaker_project_path is currently set to \"{gamemaker_project_path}\", which is NOT a relative path!"
 					+ f"\nFrida suggests: use \"{os.path.relpath(start=".", path=gamemaker_project_path)}\" instead")
 
-	if os.path.exists(f"{frida_root}/base"):
+	if os.path.exists(f"{frida_root}/base") and not (os.path.exists(f"{frida_root}/base/profile.json") and "profile.json" not in dict["zip_exclude"]):
 		unaccounted = [dir for dir in os.listdir(f"{frida_root}/base") if dir not in dict["mod_order"] and os.path.isdir(f"{frida_root}/base/{dir}")]
 		if len(unaccounted) != 0:
 			warnings.append(f"\"mod_order\" is missing some mods that exist in the \"base\" folder: {unaccounted}. g3man will go over these last.")
@@ -1068,11 +1070,6 @@ def print_issues(issues, filename):
 		for i in range(len(issues)):
 			print(f"{i + 1}. {issues[i]}")
 		print()
-
-
-
-
-				
 
 def fetch_dependencies(frida_root, project_config: ProjectConfig):
 	for dependency in project_config.dependencies:
