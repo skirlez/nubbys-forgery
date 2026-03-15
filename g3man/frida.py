@@ -27,21 +27,30 @@ dotfrida = ".frida"
 
 ### dependency management ### 
 
+class DependencyFetchException(FridaException):
+	pass
+
 def lockfile_set(dependency: str, value: str):
 	print(f"Locking {dependency}: {value}")
 	if not os.path.isfile(f"{cli_frida_root}/frida.lock"):
 		lock = dict()
 	else:
-		with open(f"{cli_frida_root}/frida.lock", "r") as f:
-			lock = json.load(f)
+		try:
+			with open(f"{cli_frida_root}/frida.lock", "r") as f:
+				lock = json.load(f)
+		except:
+			raise DependencyFetchException("Failed to read lockfile/it is invalid")
 	lock[dependency] = value
 	with open(f"{cli_frida_root}/frida.lock", "w") as f:
 		json.dump(lock, f)
 
 def lockfile_get(dependency: str):
 	if os.path.isfile(f"{cli_frida_root}/frida.lock"):
-		with open(f"{cli_frida_root}/frida.lock", "r") as f:
-			lock = json.load(f)
+		try:
+			with open(f"{cli_frida_root}/frida.lock", "r") as f:
+				lock = json.load(f)
+		except:
+			raise DependencyFetchException("Failed to read lockfile/it is invalid")
 		if dependency in lock:
 			return lock[dependency]
 	return None
@@ -50,11 +59,9 @@ def path_explore_downwards(path: str, amount: int) -> str:
 	if amount <= 0:
 		return path
 	ls = os.listdir(path)
-	combined = f"{path}/{ls[0]}"
-	if len(ls) == 1 and os.path.isdir(combined):
-		return path_explore_downwards(combined, amount - 1)
-	# not sure what to do in this case
-	return path
+	if len(ls) == 1 and os.path.isdir(f"{path}/{ls[0]}"):
+		return path_explore_downwards(f"{path}/{ls[0]}", amount - 1)
+	raise DependencyFetchException("Wrong amount of zip wrappers set for this dependency")
 		
 class Dependency():
 	def __init__(self):
@@ -86,6 +93,7 @@ class PathDependency(Dependency):
 	def __str__(self):
 		return f"path:{self.path}"
 
+
 class GitHubTagDependency(Dependency):
 	def __init__(self, user: str, repo: str, frida_root : str, tag: Optional[str]):
 		self.user = user
@@ -107,7 +115,7 @@ class GitHubTagDependency(Dependency):
 						content = json.loads(response.read().decode('utf-8'))
 						tag_name = content["tag_name"]
 				except Exception as e:
-					raise FridaException(f"Failed to fetch latest release of {self}")
+					raise DependencyFetchException(f"Failed to fetch latest release of {self}")
 				lockfile_set(str(self), tag_name)
 		else:
 			tag_name = self.tag
@@ -175,22 +183,23 @@ def hash_gamemaker_project(path: str):
 	project_folder = os.path.abspath(path)
 	listdir = sorted(os.listdir(project_folder))
 
-	ignored_items = ["g3man", ".gitattributes", ".git", ".gitignore", ".frida"]
-	for ignored in ignored_items:
-		if ignored in listdir:
-			listdir.remove(ignored)
+	normalized_ignored_files = [os.path.normpath(path) for path in user_dict["gamemaker_hash_exclude"]]
 
 	hash_func = hashlib.md5()
-	for item in listdir:
-		full_item_path = os.path.join(project_folder, item)
-		if (os.path.isfile(full_item_path)):
-			hash_file(full_item_path, item, hash_func)
-			continue
-		for root, _, files in os.walk(full_item_path, followlinks=True):
-			for file_path in sorted(files):
-				full_path = os.path.join(root, file_path)
-				relative_path = os.path.relpath(full_path, project_folder)
-				hash_file(full_path, relative_path, hash_func)
+	for root, directories, files in os.walk(project_folder, followlinks=True):
+		relative_root = os.path.relpath(root, project_folder)
+		i = 0
+		length = len(directories)
+		while (i < length):
+			if os.path.normpath(directories[i]) in normalized_ignored_files:
+				del directories[i]
+				i -= 1
+				length -= 1
+			i += 1
+		for file_path in sorted(files):
+			full_path = os.path.join(root, file_path)
+			relative_path = os.path.relpath(full_path, project_folder)
+			#hash_file(full_path, relative_path, hash_func)
 
 	return hash_func.hexdigest()
 
@@ -318,7 +327,7 @@ def build_gamemaker_project(mod_path: str, project_config: ProjectConfig, force_
 				for directory in directories:
 					os.makedirs(f"{new_included_files_path}/{relative_root}/{directory}", exist_ok=True)
 				for file in files:
-					if file in IGOR_ASSETS_FILTER and root == included_files_path:
+					if root == included_files_path and file in IGOR_ASSETS_FILTER:
 						continue
 					shutil.copy(f"{root}/{file}", f"{new_included_files_path}/{relative_root}/{file}")
 		
@@ -350,12 +359,8 @@ def make_profile_json_dict(project_config: ProjectConfig):
 	p["links"] = []
 	return p
 
-
-
-		
-
-
 ### packaging mod
+# 
 def package_mod(frida_root: str, project_config: ProjectConfig, linkbase=False):
 	profile_json = make_profile_json_dict(project_config)
 	if not os.path.exists(f"{cli_frida_root}/base/profile.json"):
@@ -396,7 +401,7 @@ def recreate_out_folder(frida_root: str):
 	
 def package_routine(frida_root: str, project_config: ProjectConfig, should_package_dependencies = True, linkbase=False, name = ""):
 	if name == "":
-		print(f"Packaging...")
+		print(f"Packaging: This project...")
 	else:
 		print(f"Packaging: {name}")
 
@@ -431,26 +436,23 @@ def zip_out_folder(frida_root, project_config: ProjectConfig):
 			else:
 				root_folder_name = profile_json["id"] 
 				zip_filename = profile_json["id"]
-	
 	with zipfile.ZipFile(f"{frida_root}/{zip_filename}.zip", "w") as f:
 		for root, directories, files in os.walk(out_folder, followlinks=True):
-			archive_root = os.path.relpath(root, out_folder)
+			relative_root = os.path.relpath(root, out_folder)
 
-			# TODO: does not handle folders correctly
-			if root == out_folder:
-				length = len(directories)
-				i = 0
-				while (i < length):
-					if os.path.normpath(directories[i]) in normalized_zip_exclude:
-						del directories[i]
-						i -= 1
-						length -= 1
-					i += 1
+			length = len(directories)
+			i = 0
+			while (i < length):
+				if os.path.normpath(directories[i]) in normalized_zip_exclude:
+					del directories[i]
+					i -= 1
+					length -= 1
+				i += 1
 			
 			for file in files:
-				archive_path = f"{archive_root}/{file}"
+				archive_path = f"{relative_root}/{file}"
 				if os.path.normpath(archive_path) not in normalized_zip_exclude:
-					f.write(f"{root}/{file}", f"{archive_root}/{file}")
+					f.write(f"{root}/{file}", f"{relative_root}/{file}")
 
 
 ### applying mod ###
@@ -493,19 +495,19 @@ def try_starting_game():
 		if start_game_command == "":
 			print("Couldn't determine which file is the executable. Please supply \"start_game_command\" in the user config to tell Frida what to do to launch the game.")
 			return
-		
+		cmd = start_game_command
 	else:
 		cmd = executables[0]
-	
-	if start_game_command != "":
-		cmd = start_game_command.split(" ") # not correct ! TODO
+
 		
 	
 	print(f"Launching game. Running command: {cmd}")
 	try:
 		status = subprocess.run(
 			cmd,
-			cwd = game_path)
+			cwd = game_path,
+			shell = True,
+		)
 	except Exception as e:
 		print(e)
 		pass
@@ -693,7 +695,7 @@ def compare_dict_to_contract(dict, contract, issues):
 frida_template_project_config = """
 // This file is the project config. This file isn't personal to any user and should be shared by everyone working on this mod.
 // 
-// You *can* use backslashes when filling out paths, but they must be escaped, i.e. you have to write "\\" instead of "\" every time.
+// You *can* use backslashes when filling out paths, but they must be escaped, i.e. you have to write "\\\\" instead of "\" every time.
 // Save yourself the hassle and use forward slashes.
 //
 // Frida wiki entry: https://github.com/skirlez/frida/wiki/Project-Config
@@ -729,24 +731,24 @@ frida_template_project_config = """
 	// If this is disabled, you have to manually specify all the dependencies of your dependencies.
 	"recursive_dependencies" : true,
 	
-	// Mod priority for the testing profile (in the "out" folder, used by "frida.py apply".). 
+	// Mod priority for the output profile (the "out" folder"). 
 	// You should put the ID of your mod and its dependencies here.
 	// Earlier in the list means higher priority.
 	// 
-	// If you have a "profile.json" file in the "base" folder,
+	// If you have a profile.json file in the "base" folder,
 	// this setting will not override it.
 	"mod_order" : [],
 	
-	// Modded save name for the testing profile (in the "out" folder, used by "frida.py apply".).
+	// Modded save name for the output profile (the "out" folder).
 	// Leaving this as blank will use the same save folder as the vanilla game,
 	// Changing this will change the save folder. (Meaning you will have completely isolated save files).
 	//
-	// If you have a "profile.json" file in the "base" folder,
+	// If you have a profile.json file in the "base" folder,
 	// this setting will not override it.
 	"modded_save_name" : "",
 	
 	// Which files and folders inside "out" should not be zipped when using `frida.py package --zip`.
-	"zip_exclude" : [],
+	"zip_exclude" : ["profile.json"],
 	
 	// This number is used for potential auto-upgrading of this file,
 	// and you shouldn't change it.
@@ -852,7 +854,8 @@ frida_template_user_config = """
 // 
 // You *can* use backslashes when filling out paths, but they must be escaped, i.e. you have to write "\\\\" instead of "\\" every time.
 // Save yourself the hassle and use forward slashes.
-
+//
+// Frida wiki entry: https://github.com/skirlez/frida/wiki/User-Config
 {
 	// The path to g3man's executable file.
 	// https://github.com/skirlez/g3man/releases
@@ -869,11 +872,6 @@ frida_template_user_config = """
 	// This'll be data.win for windows, or game.unx for example on Linux.
 	// Note that if you are using Proton on Steam for example, this will use the windows name.
 	"game_datafile_name": "",
-	
-	// Using an argument, you can tell Frida to launch the game after applying your mod.
-	// In case Frida cannot manage to do so automatically, you can instead have frida execute
-	// this field as a command.
-	"start_game_command": "",
 	
 	// (REQUIRED FOR BUILDING GAMEMAKER PROJECTS ONLY)
 	// Linux: Likely is /home/USER/.local/share/GameMakerStudio-Beta/Cache
@@ -896,13 +894,15 @@ frida_template_user_config = """
 }
 """
 frida_user_config_optional = {
-	"gamemaker_hash_ignore" : ["g3man", ".gitattributes", ".git", ".gitignore", ".frida"]
+	"gamemaker_hash_exclude" : ["g3man", ".gitattributes", ".git", ".gitignore", ".frida"],
+	"start_game_command" : ""
 }
 user_config_contract = json.loads(strip_comments(frida_template_user_config))
 
 def validate_user_dict(dict):
 	issues = []
 	compare_dict_to_contract(dict, user_config_contract, issues)
+	compare_dict_to_contract_assign_if_missing(dict, frida_user_config_optional, issues)
 	if len(issues) != 0:
 		return (issues, [])
 	
@@ -939,7 +939,6 @@ def validate_combination(user_dict, project_dict):
 	if (project_dict["gamemaker_runtime_version"] != ""
 		and os.path.exists(f"{user_dict["gamemaker_cache_path"]}/runtimes") 
 		and not os.path.exists(f"{user_dict["gamemaker_cache_path"]}/runtimes/runtime-{project_dict["gamemaker_runtime_version"]}")):
-		print(f"{user_dict["gamemaker_cache_path"]}/runtimes/runtime-{project_dict["gamemaker_runtime_version"]}")
 		issues.append(f"You are missing the \"{project_dict["gamemaker_runtime_version"]}\" runtime, which is required by one of the projects. Please download it from the IDE.")
 	return (issues, [])
 		
@@ -1073,22 +1072,43 @@ def print_issues(issues, filename):
 
 def fetch_dependencies(frida_root, project_config: ProjectConfig):
 	for dependency in project_config.dependencies:
+		print(f"Fetching: \"{dependency}\"... ", end="")
 		path = dependency.get_path()
-		os.makedirs(path, exist_ok=True)
 		if dependency.needs_download():
-			zip_url = dependency.get_zip_url()
-			urllib.request.urlretrieve(zip_url, f"{dotfrida}/tmp.zip")
-			with zipfile.ZipFile(f"{dotfrida}/tmp.zip", "r") as f:
-				f.extractall(path)
-			os.remove(f"{dotfrida}/tmp.zip")
+			if os.path.exists(path):
+				
+				def normabs(path):
+					return os.path.normpath(os.path.abspath(path))
+					
+				assert os.path.commonpath([normabs(dotfrida), normabs(path)]) == normabs(dotfrida)
+				shutil.rmtree(path)
+			os.makedirs(path, exist_ok=True)
+			try:
+				zip_url = dependency.get_zip_url()
+				urllib.request.urlretrieve(zip_url, f"{dotfrida}/tmp.zip")
+				with zipfile.ZipFile(f"{dotfrida}/tmp.zip", "r") as f:
+					f.extractall(path)
+			except DependencyFetchException as e:
+				print("Failed")
+				print(f"Failed to fetch {dependency}: {e.message}")
+				continue
+			except Exception as e:
+				print("Failed")
+				print(f"Something went wrong while fetching {dependency}: {e}")
+				
+			try:
+				os.remove(f"{dotfrida}/tmp.zip")
+			except:
+				pass
+			print("Done")
 			
 		if project_config.recursive_dependencies:
 			paths = dependency.get_frida_root_candidate_paths(path)
 			frida_root = check_frida_root_candidates(paths)
 			dependency_project_dict = get_project_config(frida_root)
-			print(f"Fetching: \"{dependency}\"")
 			dependency_project_config = validation_routine(frida_root, dependency_project_dict)
 			fetch_dependencies(frida_root, dependency_project_config)
+
 
 if __name__ == "__main__":
 	python_version_routine()
