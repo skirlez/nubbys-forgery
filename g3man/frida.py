@@ -401,7 +401,7 @@ def recreate_out_folder(frida_root: str):
 	
 def package_routine(frida_root: str, project_config: ProjectConfig, should_package_dependencies = True, linkbase=False, name = ""):
 	if name == "":
-		print(f"Packaging: This project...")
+		print(f"Packaging: This project")
 	else:
 		print(f"Packaging: {name}")
 
@@ -462,7 +462,7 @@ def apply_mod(frida_root, user_config):
 	try:
 		status = subprocess.run(
 			[user_config["g3man_path"], "apply",
-				"--path", "out",
+				"--path", f"{cli_frida_root}/out",
 				"--datafile", user_config["clean_datafile_path"],
 				"--out", user_config["game_path"],
 				"--outname", user_config["game_datafile_name"]
@@ -473,6 +473,7 @@ def apply_mod(frida_root, user_config):
 		return
 	if (status.returncode != 0):
 		print("Something failed in g3man. Aborting.")
+		print(f"Args passed in: {status.args}")
 		exit()
 
 ### cli
@@ -537,6 +538,8 @@ def strip_comments(str: str):
 			build += str[i]
 			if str[i] == '"':
 				state = 0
+	if state == 0 or state == 3:
+		build += str[len(str) - 1]
 	return build
 
 def fixup_paths_user_config(dict: dict[str, Any]):
@@ -1072,7 +1075,7 @@ def print_issues(issues, filename):
 
 def fetch_dependencies(frida_root, project_config: ProjectConfig):
 	for dependency in project_config.dependencies:
-		print(f"Fetching: \"{dependency}\"... ", end="")
+		print(f"Fetching: \"{dependency}\"... ", end="", flush=True)
 		path = dependency.get_path()
 		if dependency.needs_download():
 			if os.path.exists(path):
