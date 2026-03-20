@@ -61,13 +61,14 @@ function append_translations(loc_data) {
 	var h = ds_grid_height(global.LocData)
 	ds_grid_resize(global.LocData, ds_grid_width(global.LocData), 
 		h + count_keys_not_already_added(loc_data))
-			
+	
+	var count = 0;
 	for (var i = 0; i < ds_grid_height(loc_data); i++) {
 		var key = ds_grid_get(loc_data, 0, i);
 		if ds_map_exists(global.Translations, key)
 			continue;
-		var line = h + i;
-		
+		var line = h + count;
+		count++;
 		ds_map_set(global.Translations, key, line)
 		ds_grid_set(global.LocData, 0, line, key)
 		var empty = ""

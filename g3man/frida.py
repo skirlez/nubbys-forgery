@@ -319,7 +319,6 @@ def build_gamemaker_project(mod_path: str, project_config: ProjectConfig, force_
 		
 				
 		included_files_top_level = [file for file in os.listdir(included_files_path) if file not in IGOR_ASSETS_FILTER]
-		print(included_files_top_level)
 		if (len(included_files_top_level) != 0):
 			os.mkdir(new_included_files_path)
 			for root, directories, files in os.walk(included_files_path):
