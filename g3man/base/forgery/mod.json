@@ -7,7 +7,7 @@
     "target_g3man_version" : 6,
     "depends" : [],
     "breaks" : [],
-    "version" : "7.0.0",
+    "version" : "8.0.0",
     
     "imports": ["g3man_6"],
     

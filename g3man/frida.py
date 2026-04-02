@@ -13,7 +13,7 @@ from typing import *
 import urllib.request
 
 
-frida_version = 4
+frida_version = 5
 
 class FridaException(Exception):
 	def __init__(self, message: str):
@@ -191,7 +191,7 @@ def hash_gamemaker_project(path: str):
 		i = 0
 		length = len(directories)
 		while (i < length):
-			if os.path.normpath(directories[i]) in normalized_ignored_files:
+			if os.path.normpath(f"{relative_root}/{directories[i]}") in normalized_ignored_files:
 				del directories[i]
 				i -= 1
 				length -= 1
@@ -199,7 +199,7 @@ def hash_gamemaker_project(path: str):
 		for file_path in sorted(files):
 			full_path = os.path.join(root, file_path)
 			relative_path = os.path.relpath(full_path, project_folder)
-			#hash_file(full_path, relative_path, hash_func)
+			hash_file(full_path, relative_path, hash_func)
 
 	return hash_func.hexdigest()
 
@@ -442,7 +442,7 @@ def zip_out_folder(frida_root, project_config: ProjectConfig):
 			length = len(directories)
 			i = 0
 			while (i < length):
-				if os.path.normpath(directories[i]) in normalized_zip_exclude:
+				if os.path.normpath(f"{relative_root}/{directories[i]}") in normalized_zip_exclude:
 					del directories[i]
 					i -= 1
 					length -= 1
@@ -1074,7 +1074,7 @@ def print_issues(issues, filename):
 
 def fetch_dependencies(frida_root, project_config: ProjectConfig):
 	for dependency in project_config.dependencies:
-		print(f"Fetching: \"{dependency}\"... ", end="", flush=True)
+		print(f"Fetching: \"{dependency}\"... ")
 		path = dependency.get_path()
 		if dependency.needs_download():
 			if os.path.exists(path):
@@ -1102,7 +1102,6 @@ def fetch_dependencies(frida_root, project_config: ProjectConfig):
 				os.remove(f"{dotfrida}/tmp.zip")
 			except:
 				pass
-			print("Done")
 			
 		if project_config.recursive_dependencies:
 			paths = dependency.get_frida_root_candidate_paths(path)
