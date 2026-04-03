@@ -1,7 +1,7 @@
 {
     "mod_id" : "forgery",
     "display_name" : "Nubby's Forgery",
-    "description" : "Provides the Forgery API, allowing you to easily extend base game systems. Also enables running Catspeak/GMLspeak code.",
+    "description" : "Provides the Forgery API, allowing you to easily extend base game systems. Also enables running Catspeak code.",
     "icon_path" : "",
     "credits" : ["skirlez"],
     "target_g3man_version" : 6,

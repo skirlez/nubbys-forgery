@@ -105,10 +105,8 @@ function append_translations(loc_data, is_english) {
 			// the flag obj_Debug.ShowTestingTranslations controls whether or not to show column 2 instead of column 1.
 			
 			// Forgery does not bother with this.
-			
  			ds_grid_set(global.LocData, 1, line, empty)
 			ds_grid_set(global.LocData, 2, line, ds_grid_get(loc_data, 1, i))
-			log_info(line)
 		}
 	}	
 }
