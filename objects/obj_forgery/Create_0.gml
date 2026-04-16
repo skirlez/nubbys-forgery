@@ -1,7 +1,7 @@
 global.logging_socket = network_create_socket(network_socket_udp)
 global.empty_method = method(self, empty_function)
 global.mod_id_to_mod_map = ds_map_create();
-global.mods_directory = "g3man_applied_profile";
+global.mods_directory = g3man.profile_path;
 
 create_api_objects()
 initialize_catspeak();

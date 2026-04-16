@@ -1,6 +1,6 @@
 
 function create_api_objects() {
-	global.forgery_7 = fixup({
+	global.forgery_9 = fixup({
 		register_item : mod_register_item,
 		register_perk : mod_register_perk,
 		register_supervisor : mod_register_supervisor,
@@ -41,7 +41,7 @@ function create_api_objects() {
 			supervisor : mod_resources.supervisor
 		}
 	});
-	
+	global.forgery_7 = global.forgery_9
 }
 
 function fixup(struct) {

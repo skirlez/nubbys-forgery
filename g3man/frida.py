@@ -13,7 +13,7 @@ from typing import *
 import urllib.request
 
 
-frida_version = 5
+frida_version = 6
 
 class FridaException(Exception):
 	def __init__(self, message: str):
@@ -280,6 +280,7 @@ def build_gamemaker_project(mod_path: str, project_config: ProjectConfig, force_
 		status = subprocess.run(
 			[igor_path, 
 			"-j=8",
+			f"-ac=/cins", # case insensitive
 			f"--user={user_dict["gamemaker_user_directory_path"]}",
 			f"--project={yyp_path}",
 			f"--config={project_config.gamemaker_configuration}",
@@ -362,8 +363,8 @@ def make_profile_json_dict(project_config: ProjectConfig):
 # 
 def package_mod(frida_root: str, project_config: ProjectConfig, linkbase=False):
 	profile_json = make_profile_json_dict(project_config)
-	if not os.path.exists(f"{cli_frida_root}/base/profile.json"):
-		with open(f"{cli_frida_root}/out/profile.json", "wt") as f:
+	if not os.path.exists(f"{frida_root}/base/profile.json"):
+		with open(f"{frida_root}/out/profile.json", "wt") as f:
 			json.dump(profile_json, f)
 	
 	if project_config.gamemaker_project_path == "":

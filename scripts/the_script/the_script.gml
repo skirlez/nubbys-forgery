@@ -1,6 +1,6 @@
 // Everything used to be in this script. Then I put things in other scripts.
 #macro agi asset_get_index
-#macro g3man global.g3man_6
+#macro g3man global.g3man_7
 
 function create_mod(mod_folder_name) {
 	var mod_definition_file = file_text_open_read($"{global.mods_directory}/{mod_folder_name}/mod.json")
@@ -334,16 +334,24 @@ function clear_all_mods() {
 	registry_clear(global.index_registry)
 }
 
+function sort_by_mod_order(list) {
+	array_sort(list, function (current, next) {
+		var current_index = array_get_index(g3man.mod_order, current)
+		var next_index = array_get_index(g3man.mod_order, next)
+		return sign(current_index - next_index)
+	})	
+}
 
 // Reads all mods and returns a list of their structs
 function read_all_mods() {
 	var folders = get_all_directories(global.mods_directory)
+	sort_by_mod_order(folders)
+	log_info(global.mods_directory)
 	for (var i = 0; i < array_length(folders); i++) {
 		var mod_folder_name = folders[i];
-		if variable_global_exists("g3man_6") {
-			if array_contains(global.g3man_6.disabled_mods, mod_folder_name)
-				continue;
-		}
+		if array_contains(g3man.disabled_mods, mod_folder_name)
+			continue;
+		log_info(mod_folder_name)
 		var mod_result = create_mod(mod_folder_name)
 		if (mod_result.is_error()) {
 			log_error(mod_result.error.text)

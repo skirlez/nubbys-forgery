@@ -4,14 +4,14 @@
     "description" : "Provides the Forgery API, allowing you to easily extend base game systems. Also enables running Catspeak code.",
     "icon_path" : "",
     "credits" : ["skirlez"],
-    "target_g3man_version" : 6,
+    "target_g3man_version" : 7,
     "depends" : [],
     "breaks" : [],
-    "version" : "8.0.0",
+    "version" : "9.0.0",
     
-    "imports": ["g3man_6"],
+    "imports": ["g3man_7"],
     
-    "exports" : ["forgery_7"],
+    "exports" : ["forgery_7", "forgery_9"],
     
     "patches" : [
         {

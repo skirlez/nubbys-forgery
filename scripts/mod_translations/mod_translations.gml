@@ -46,17 +46,27 @@ function get_current_language_id() {
 
 // Called after scr_InitTranslations()
 function append_mod_translations() {
+	// treated as a hashset - only value inserted is `true`
+	static overriden_translations = ds_map_create()
+	ds_map_clear(overriden_translations)
+	
 	var lang = get_current_language_id();
 	var is_english = (lang == "en")
 	
 	// global.Translations is a ds_map, mapping keys to rows on the csv
 	// global.LocData is the base game csv ds_grid
 	var mods = ds_map_values_to_array(global.mod_id_to_mod_map)
+	sort_by_mod_order(mods)
 	for (var i = 0; i < array_length(mods); i++) {
 		var wod = mods[i];
 		
+		// treated as a hashset - only value inserted is `true`
+		// keeps track of which translations have been added by this mod so that the english fallback translations
+		// don't override new keys that were already overriden by the first language
+		var keys_touched_set = noone;
+		
 		if ds_map_exists(wod.translations, lang) {
-			append_translations(ds_map_find_value(wod.translations, lang), is_english)
+			keys_touched_set = append_translations(ds_map_find_value(wod.translations, lang), is_english, overriden_translations)
 		}
 
 		// always append english keys if we have them (as a fallback)
@@ -64,12 +74,15 @@ function append_mod_translations() {
 			continue; // english already appended
 		if !ds_map_exists(wod.translations, "en")
 			continue;
-		append_translations(ds_map_find_value(wod.translations, "en"), false)
+		append_translations(ds_map_find_value(wod.translations, "en"), false, overriden_translations, keys_touched_set)
+		
+		if (keys_touched_set != noone)
+			ds_map_destroy(keys_touched_set)
 	}
 }
 
 
-function count_keys_not_already_added(loc_data) {
+function count_keys_that_will_be_added(loc_data) {
 	var count = 0
 	for (var i = 0; i < ds_grid_height(loc_data); i++) {
 		var key = ds_grid_get(loc_data, 0, i);
@@ -79,20 +92,33 @@ function count_keys_not_already_added(loc_data) {
 	return count
 }
 
-function append_translations(loc_data, is_english) {
+function append_translations(loc_data, is_english, overriden_translations_set, do_not_override_set = noone) {
 	// TODO error handling if the mod csv isn't two values per row. Check here and log
 	var h = ds_grid_height(global.LocData)
 	ds_grid_resize(global.LocData, ds_grid_width(global.LocData), 
-		h + count_keys_not_already_added(loc_data))
+		h + count_keys_that_will_be_added(loc_data))
+	
+	var keys_touched = ds_map_create();
 	
 	var count = 0;
 	for (var i = 0; i < ds_grid_height(loc_data); i++) {
 		var key = ds_grid_get(loc_data, 0, i);
-		if ds_map_exists(global.Translations, key)
-			continue;
-		var line = h + count;
-		count++;
-		ds_map_set(global.Translations, key, line)
+		var line;
+		if ds_map_exists(global.Translations, key) {
+			if (ds_map_exists(overriden_translations_set, key))
+					|| (do_not_override_set != noone && ds_map_exists(do_not_override_set, key)) {
+				continue;
+			}
+			ds_map_set(overriden_translations_set, key, true)
+			line = ds_map_find_value(global.Translations, key)
+		}
+		else {
+			line = h + count;
+			ds_map_set(global.Translations, key, line)
+			
+			count++;
+		}
+		
 		ds_grid_set(global.LocData, 0, line, key)
 		var empty = ""
 		if is_english {
@@ -108,5 +134,9 @@ function append_translations(loc_data, is_english) {
  			ds_grid_set(global.LocData, 1, line, empty)
 			ds_grid_set(global.LocData, 2, line, ds_grid_get(loc_data, 1, i))
 		}
+		
+		
+		ds_map_add(keys_touched, key, true)
 	}	
+	return keys_touched
 }

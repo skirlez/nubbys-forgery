@@ -10,7 +10,9 @@ function initialize_catspeak() {
 
 function expose_constants(interface) {
 	interface.exposeDynamicConstant("forgery", function() {
-		return global.forgery_7
+		if global.cmod.custom.forgery.target_version == 7
+			return global.forgery_7
+		return global.forgery_9
 	});
 }
 
