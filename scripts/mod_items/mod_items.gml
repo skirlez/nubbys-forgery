@@ -51,7 +51,7 @@ function mod_register_item(item, item_id, wod = global.cmod) {
 	if array_length(compliance.mismatched_types) > 0 {
 		compliance.missing = [];
 		log_error($"Item {item_id} from {wod.mod_id} has bad variables!\n" 
-			+ generate_compliance_error_text(item, item_contract, compliance)
+			+ generate_compliance_error_text(item, optional_variables, compliance)
 			+ "\nThe item is not registered.")
 		return;
 	}

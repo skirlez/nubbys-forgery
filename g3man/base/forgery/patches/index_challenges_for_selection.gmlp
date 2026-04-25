@@ -1,0 +1,5 @@
+meta:
+targets = 'gml_Object_obj_ChallengesMGMT_Create_0'
+patch:
+move_to_end()
+write('index_challenges_for_selection()')

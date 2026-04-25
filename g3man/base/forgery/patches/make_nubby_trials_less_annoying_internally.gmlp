@@ -1,0 +1,35 @@
+meta: 
+targets = 'gml_Object_obj_ChallengesMGMT_Create_0'
+patch:
+
+find_line_with('ChallengeTN[10] = spr_CHTN_NT1')
+write('if false {')
+find_line_with('ChallengeTN[14] = spr_CHTN_NT5')
+write_last('}')
+
+move_to_end()
+write('
+NubbyTrialsTN[0] = spr_CHTN_NT1;
+NubbyTrialsTN[1] = spr_CHTN_NT2;
+NubbyTrialsTN[2] = spr_CHTN_NT3;
+NubbyTrialsTN[3] = spr_CHTN_NT4;
+NubbyTrialsTN[4] = spr_CHTN_NT5;
+')
+
+meta:
+targets = 'gml_Object_obj_ChallengesMGMT_Draw_0'
+patch:
+find_line_with('ChallengeTN[10 + NubbyTrialsPage]')
+write_replace_substring('ChallengeTN[10 + NubbyTrialsPage]', 'NubbyTrialsTN[NubbyTrialsPage]')
+
+meta:
+targets = 'gml_Object_obj_CHGoBtn_Alarm_1'
+patch:
+find_all_lines_with('ChallengeTN[10 + obj_ChallengesMGMT.NubbyTrialsPage]')
+write_replace_substring('ChallengeTN[10 + obj_ChallengesMGMT.NubbyTrialsPage]', 'NubbyTrialsTN[obj_ChallengesMGMT.NubbyTrialsPage]')
+
+meta:
+targets = 'gml_Object_obj_CHGoBtn_Alarm_1'
+patch:
+find_line_with('if (obj_ChallengesMGMT.ChallengeOrder[obj_ChallengesMGMT.ChallengePage] < 10)')
+write_replace_substring('< 10', '!= 10')

@@ -2,9 +2,10 @@ enum mod_resources {
 	item,
 	perk,
 	supervisor,
+	challenge,
 	size,
 }
-global.resource_names = ["item", "perk", "supervisor"]
+global.resource_names = ["item", "perk", "supervisor", "challenge"]
 
 function registry_create() {
 	return array_create_ext(mod_resources.size, function () { 

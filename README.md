@@ -26,7 +26,7 @@ Below is a list of what I want the API to support with a tick with what's implem
 - [x] Perks
 - [x] Supervisors
 - [ ] Nubby/Item Skins
-- [ ] Challenges
+- [x] Challenges
 - [ ] Special/Boss Rounds
 - [x] Translations
 - [x] Scripting via Catspeak

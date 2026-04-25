@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"mod_perks",
+  "%Name":"mod_challenges",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"mod_perks",
+  "name":"mod_challenges",
   "parent":{
     "name":"resources",
     "path":"folders/Scripts/resources.yy",

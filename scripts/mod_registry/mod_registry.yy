@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"mod_registry",
   "parent":{
-    "name":"Scripts",
-    "path":"folders/Scripts.yy",
+    "name":"resources",
+    "path":"folders/Scripts/resources.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

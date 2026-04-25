@@ -1,0 +1,8 @@
+meta: 
+targets = 'gml_GlobalScript_scr_InitChallengeManager'
+patch:
+find_line_with('function scr_InitChallengeManager')
+move(1)
+enter_scope()
+move_to_end()
+write('create_mod_challenge_object(arg0, arg1)')

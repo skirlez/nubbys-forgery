@@ -120,17 +120,17 @@ function create_mod(mod_folder_name) {
 		))	
 	}
 	
-	if wod.custom.forgery.target_version != 7 {
+	if !array_contains(get_forgery_api_object_versions(), wod.custom.forgery.target_version) {
 		return new result_error(new generic_error(
 			$"mod.json in {mod_folder_name} requests a non-existent API version: {wod.custom.forgery.target_version}\n"
-			+ "(the only possible target_version at the moment is 7)"
+			+ $"(Possible versions: {wod.custom.forgery.target_version})"
 		))		
 	}
 	
 	wod.items = []
 	wod.perks = []
 	wod.supervisors =  []
-	//wod.foods = ds_map_create();
+	wod.challenges = []
 	wod.sprites = ds_map_create();
 	wod.sounds = ds_map_create();
 	

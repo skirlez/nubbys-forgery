@@ -24,6 +24,7 @@ global.last_indices = array_create(mod_resources.size)
 global.last_indices[mod_resources.item] = 183
 global.last_indices[mod_resources.perk] = 32
 global.last_indices[mod_resources.supervisor] = 11
+global.last_indices[mod_resources.challenge] = 10
 
 log_info("****************\Forgery start****************")
 read_all_mods()

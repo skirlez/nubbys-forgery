@@ -4,6 +4,7 @@ function create_api_objects() {
 		register_item : mod_register_item,
 		register_perk : mod_register_perk,
 		register_supervisor : mod_register_supervisor,
+		register_challenge : mod_register_challenge,
 		
 		register_autosave_save_callback : mod_register_autosave_save_callback,
 		register_autosave_load_callback : mod_register_autosave_load_callback,
@@ -42,6 +43,10 @@ function create_api_objects() {
 		}
 	});
 	global.forgery_7 = global.forgery_9
+}
+
+function get_forgery_api_object_versions() {
+	return [7, 9]	
 }
 
 function fixup(struct) {

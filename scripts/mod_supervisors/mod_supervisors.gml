@@ -113,6 +113,8 @@ function index_supervisors_for_selection() {
 		}
 	}
 }
+
+
 function index_supervisor(supervisor, string_id, index) {
 	var obj = allocate_object(mod_resources.supervisor, supervisor)
 	// TODO. use a map for this.

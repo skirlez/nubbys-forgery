@@ -37,6 +37,15 @@ function mod_register_perk(perk, perk_id, wod = global.cmod) {
 	static optional_variables = {
 		manage_own_trigger : false,
 	}
+	var compliance = get_struct_compliance_with_contract(perk, optional_variables)
+	if array_length(compliance.mismatched_types) > 0 {
+		compliance.missing = [];
+		log_error($"Perk {perk_id} from {wod.mod_id} has bad variables!\n" 
+			+ generate_compliance_error_text(perk, optional_variables, compliance)
+			+ "\nThe perk is not registered.")
+		return;
+	}
+	
 	initialize_missing(perk, optional_variables)
 	
 
