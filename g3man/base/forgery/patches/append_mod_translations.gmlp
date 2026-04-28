@@ -2,5 +2,7 @@
 meta:
 targets = 'gml_GlobalScript_scr_InitTranslations'
 patch:
-find_line_with('global.Translations =')
-write('append_mod_translations()')
+move(2)
+enter_scope()
+find_all_lines_with('break')
+write_before('append_mod_translations()')

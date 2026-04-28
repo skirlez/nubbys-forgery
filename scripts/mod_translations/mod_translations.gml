@@ -41,6 +41,10 @@ function get_current_language_id() {
 			return "fr"
 		case 9:
 			return "pl"
+		case 10:
+			// TODO!!!!!! choose between this (ugly) and es-LA (weird since it's for "Latin America" and not "Laos")
+			// also TODO: give up on forgery having its own naming scheme and let/(require?) people to use names matching base game files
+			return "es-419"
 	}
 }
 

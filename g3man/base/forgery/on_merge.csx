@@ -48,9 +48,13 @@ UndertaleGameObject cloneObject(UndertaleGameObject sourceObj, string newName) {
 // Duplicating generic objects
 UndertaleGameObject obj_generic_item0 = Data.GameObjects.ByName("obj_generic_item0");
 UndertaleGameObject obj_generic_perk0 = Data.GameObjects.ByName("obj_generic_perk0");
+
+// TODO: these two don't *really* need to be cloned
 UndertaleGameObject obj_generic_supervisor0 = Data.GameObjects.ByName("obj_generic_supervisor0");
+UndertaleGameObject obj_generic_challenge0 = Data.GameObjects.ByName("obj_generic_challenge0");
 for (int i = 1; i < 1024; i++) {
 	cloneObject(obj_generic_item0, "obj_generic_item" + i.ToString());
 	cloneObject(obj_generic_perk0, "obj_generic_perk" + i.ToString());
 	cloneObject(obj_generic_supervisor0, "obj_generic_supervisor" + i.ToString());
+	cloneObject(obj_generic_challenge0, "obj_generic_challenge" + i.ToString());
 }

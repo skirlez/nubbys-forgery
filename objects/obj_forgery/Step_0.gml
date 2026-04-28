@@ -13,7 +13,7 @@ if keyboard_check_pressed(ord("R")) && room == agi("Roo_TitleMenu") {
 	
 	ds_map_destroy(global.Translations)
 	ds_grid_destroy(global.LocData)
-	agi("scr_InitTranslations")()
+	agi("scr_InitTranslations")(false)
 	
 	// reload some saves (needed for supervisors)
 	agi("scr_LoadData")("Progression")

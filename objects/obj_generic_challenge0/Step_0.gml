@@ -14,5 +14,3 @@ if (global.CursTar == id) {
 else if (instance_exists(challenge_desc))
 	challenge_desc.ChTarDesc = -1;
 
-
-challenge.on_step();

@@ -27,28 +27,13 @@ function mod_register_challenge(challenge, challenge_id, wod = global.cmod) {
 		return;
 	}
 	
-	
-	static optional_variables = {
-		on_step : global.empty_method,
-	}
-	var compliance = get_struct_compliance_with_contract(challenge, optional_variables)
-	if array_length(compliance.mismatched_types) > 0 {
-		compliance.missing = [];
-		log_error($"Challenge {challenge_id} from {wod.mod_id} has bad variables!\n" 
-			+ generate_compliance_error_text(challenge, optional_variables, compliance)
-			+ "\nThe challenge is not registered.")
-		return;
-	}
-	initialize_missing(challenge, optional_variables)
-	
-	
 	var full_id = $"{wod.mod_id}:{challenge_id}"
 	bimap_set(global.registry[mod_resources.challenge], full_id, challenge)
 	array_push(wod.challenges)
 	log_info($"Challenge {full_id} registered");
 	
 
-	// Challenges must be indexed immediately. See matching line in the challenge's file
+	// Challenges must be indexed immediately. See matching line in the supervisor's file
 	var index = global.last_indices[mod_resources.challenge] 
 		+ bimap_size(global.index_registry[mod_resources.challenge])
 		+ 1

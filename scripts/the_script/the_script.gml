@@ -411,4 +411,5 @@ function get_nf_loaded_string() {
 		+ $"{bimap_size(global.registry[mod_resources.item])} item(s), "
 		+ $"{bimap_size(global.registry[mod_resources.perk])} perk(s), "
 		+ $"{bimap_size(global.registry[mod_resources.supervisor])} supervisor(s))"
+		+ $"{bimap_size(global.registry[mod_resources.challenge])} challenges(s))"
 }
