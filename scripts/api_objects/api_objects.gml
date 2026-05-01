@@ -39,8 +39,10 @@ function create_api_objects() {
 		resources : {
 			item : mod_resources.item,
 			perk : mod_resources.perk,
-			supervisor : mod_resources.supervisor
-		}
+			supervisor : mod_resources.supervisor,
+			challenge : mod_resources.challenge
+		},
+	
 	});
 	global.forgery_7 = global.forgery_9
 }

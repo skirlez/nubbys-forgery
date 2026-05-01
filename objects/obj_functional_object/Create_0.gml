@@ -4,7 +4,7 @@ wod = global.cmod;
 if name == ""
 	error_string = $"Functional object from {wod.mod_id} errored on"
 else
-	error_string = $"Functional object from {wod.mod_id} with given name {name} errored on"
+	error_string = $"Functional object from {wod.mod_id} with given name \"{name}\" errored on"
 
 if on_create == noone
 	exit;

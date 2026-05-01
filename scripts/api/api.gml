@@ -21,6 +21,7 @@ function mod_register_function_catspeak(name, func, wod = global.cmod) {
 }
 
 
+
 function mod_run_delayed(frames, args, func, wod = global.cmod) {
 	agi("obj_forgery").add_to_run_delayed(frames, args, func, wod)
 }

@@ -9,23 +9,47 @@
 // but for now we're only saving exactly what those files save (but for forgery resources)
 
 
-// called from gml_Object_obj_Saver_Alarm_0, after the "Progression" save ID 
-function save_forgery_progression() {
-	var filename = "Progression.forgery"
-	var save = load_json_struct_or_default(filename, {
-		supervisors : {}
-	})
-	
+
+function save_supervisor_progression(s) {
 	var string_ids = bimap_lefts_array(global.registry[mod_resources.supervisor])
 	for (var i = 0; i < array_length(string_ids); i++) {
 		var string_id = string_ids[i]
 		var index = mod_registries_exchange(global.registry, global.index_registry, 
 			mod_resources.supervisor, string_id)
-		save.supervisors[$ string_id] = {
+		s[$ string_id] = {
 			unlocked : bool(agi("obj_GAME").U_SV[index]),
 			wins : agi("obj_GAME").SvWins[index],
 		}
 	}
+}
+function save_challenge_progression(s) {
+	var string_ids = bimap_lefts_array(global.registry[mod_resources.challenge])
+	for (var i = 0; i < array_length(string_ids); i++) {
+		var string_id = string_ids[i]
+		var index = mod_registries_exchange(global.registry, global.index_registry, 
+			mod_resources.challenge, string_id)
+		s[$ string_id] = {
+			beaten : bool(agi("obj_GAME").BeatChallenge[index]),
+			wins : agi("obj_GAME").ChWins[index],
+			highscore : agi("obj_GAME").ChallengeHS[index]
+		}
+	}
+}
+
+
+
+// called from gml_Object_obj_Saver_Alarm_0, after the "Progression" save ID 
+function save_forgery_progression() {
+	var filename = "Progression.forgery"
+	var save = load_json_struct_or_default(filename, {
+		supervisors : {},
+		challenges : {}
+	})
+	
+	save_supervisor_progression(save.supervisors)
+	save_challenge_progression(save.challenges)
+	
+
 	var save_string = json_stringify(save)
 	var buf = buffer_create(string_byte_length(save_string) + 1, buffer_fixed, 1);
 	buffer_write(buf, buffer_string, save_string);
@@ -83,9 +107,7 @@ function load_forgery_highscore() {
 	}
 }
 
-function load_forgery_progression() {
-	var save = load_json_struct_or_default("Progression.forgery", { supervisors : {} })
-	var s = save.supervisors
+function load_supervisor_progression(s) {
 	var string_ids_in_save = variable_struct_get_names(s)
 	var string_ids = bimap_lefts_array(global.registry[mod_resources.supervisor])
 	for (var i = 0; i < array_length(string_ids); i++) {
@@ -112,6 +134,39 @@ function load_forgery_progression() {
 			}
 		}
 	}
+}
+
+
+// TODO: this is way too similar to the above function
+function load_challenge_progression(s) {
+	var string_ids_in_save = variable_struct_get_names(s)
+	var string_ids = bimap_lefts_array(global.registry[mod_resources.challenge])
+	for (var i = 0; i < array_length(string_ids); i++) {
+		var string_id = string_ids[i]
+		var index = mod_registries_exchange(global.registry, global.index_registry, 
+			mod_resources.challenge, string_id)
+		if index == undefined
+			continue; // shouldn't happen	
+		with (agi("obj_GAME")) {
+			if array_contains(string_ids_in_save, string_id) {
+				BeatChallenge[index] = s[$ string_id].beaten
+				ChWins[index] = s[$ string_id].wins
+				ChallengeHS[index] = s[$ string_id].highscore
+			}
+			else {
+				// may seem redundant, but this is necessary; see matching comment in load_supervisor_progression
+				BeatChallenge[index] = 0
+				ChWins[index] = 0
+				ChallengeHS[index] = 0
+			}
+		}
+	}
+}
+
+function load_forgery_progression() {
+	var s = load_json_struct_or_default("Progression.forgery", { supervisors : {}, challenges : {} })
+	load_supervisor_progression(s.supervisors);
+	load_challenge_progression(s.challenges);
 }
 /*
 function load_forgery_generic(filename, field, fallback = noone) {
@@ -147,6 +202,6 @@ function load_json_struct_or_default(filename, fallback) {
 	try {
 		var data = json_parse(load_string);
 	}
-	
+	initialize_missing(data, fallback)
 	return data;
 }

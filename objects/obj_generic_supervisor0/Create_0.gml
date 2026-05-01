@@ -18,11 +18,14 @@ string_id = bimap_get_left(global.registry[mod_resources.supervisor], supervisor
 
 mod_of_origin = ds_map_find_value(global.mod_id_to_mod_map, mod_identifier_get_namespace(string_id))
 
-
+// this is also how the base game checks this. 
+// i'm abstracting this away into a parameter for end users because it's stupid
+// and i hope in the future it can be changed
+var is_loading_from_autosave = (file_exists("NUBBY_AutoSave_F.save"))
 
 global.cmod = mod_of_origin;
 try {
-	execute(supervisor.on_create, id, id)
+	execute(supervisor.on_create, [id, is_loading_from_autosave], id)
 }
 catch (e) {
 	log_error($"Supervisor {string_id} errored on creation: {pretty_error(e)}")
