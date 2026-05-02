@@ -13,7 +13,7 @@ Forgery has two example mods that you can look at.
 
 The first has an item, supervisor, and perk: https://github.com/Skirlez/nubbys-forgery-example-mod
 
-The second just has one item: https://github.com/Skirlez/nubbys-forgery-example-mod-2
+The second has one item and one challenge: https://github.com/Skirlez/nubbys-forgery-example-mod-2
 
 The first mod has no GameMaker project and adds all of its functionality with the Catspeak scripting language, while the second mod has a GameMaker project, and all of its code an assets are included in it.
 
