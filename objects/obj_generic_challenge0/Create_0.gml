@@ -18,6 +18,9 @@ string_id = bimap_get_left(global.registry[mod_resources.challenge], challenge)
 
 mod_of_origin = ds_map_find_value(global.mod_id_to_mod_map, mod_identifier_get_namespace(string_id))
 
+
+sprite_index = challenge.oval_sprite
+
 // this is also how the base game checks this. 
 // i'm abstracting this away into a parameter for end users because it's stupid
 // and i hope in the future it can be changed
@@ -32,4 +35,3 @@ catch (e) {
 	// TODO leave game?
 }
 
-sprite_index = challenge.sprite

@@ -346,12 +346,10 @@ function sort_by_mod_order(list) {
 function read_all_mods() {
 	var folders = get_all_directories(global.mods_directory)
 	sort_by_mod_order(folders)
-	log_info(global.mods_directory)
 	for (var i = 0; i < array_length(folders); i++) {
 		var mod_folder_name = folders[i];
 		if array_contains(g3man.disabled_mods, mod_folder_name)
 			continue;
-		log_info(mod_folder_name)
 		var mod_result = create_mod(mod_folder_name)
 		if (mod_result.is_error()) {
 			log_error(mod_result.error.text)

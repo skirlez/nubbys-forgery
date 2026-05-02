@@ -15,6 +15,7 @@ function mod_register_challenge(challenge, challenge_id, wod = global.cmod) {
 		display_name : "",
 		description : "",
 		sprite : agi("spr_empty"),
+		oval_sprite : agi("spr_empty"),
 		on_create : global.empty_method,
 		
 	}
@@ -50,7 +51,7 @@ function index_challenges_for_selection() {
 		with (agi("obj_challengeMGMT")) {
 			var challenge = bimap_get_right(global.index_registry[mod_resources.challenge], index)
 			
-			ChallengeID[index] = agi("scr_Text")(challenge.display_name);
+			ChallengeID[index] = agi("scr_Text")(challenge.display_name, "\"");
 			ChallengeDesc[index] = agi("scr_Text")(challenge.description, "\n");
 			ChallengeTN[index] = challenge.sprite;
 			ChallengeOrder[index] = index
