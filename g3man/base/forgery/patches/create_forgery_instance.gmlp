@@ -1,7 +1,0 @@
-// Instantiate the modloader object
-meta:
-targets = 'gml_Object_obj_Debug_Create_0'
-patch:
-write(
-	'instance_create_depth(0, 0, 0, obj_forgery)'
-)

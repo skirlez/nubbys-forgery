@@ -16,7 +16,7 @@
     "patches" : [
         {
             "path" : "patches",
-            "type" : "gmlp"
+            "type" : "gmlpv2"
         }
     ],
     "datafile_path" : "mod_data.win",
