@@ -91,7 +91,7 @@ function register_items_for_gameplay() {
 			
 		object_set_sprite(obj, item.sprite)
 		agi("scr_Init_Item")(item_index,
-			agi("scr_Text")(item.display_name),
+			agi("scr_Text")(item.display_name) + (item.level == 2 ? "+" : ""),
 			obj,
 			item.level,
 			item.food,
@@ -147,7 +147,7 @@ function forgery_modded_item_effect(index) {
 	global.cmod = ds_map_find_value(global.mod_id_to_mod_map, mod_identifier_get_namespace(string_id))
 	try {
 		execute(item.on_trigger, id, id)
-		if (!item.manage_own_trigger) {
+		if (!item.manage_own_trigger && item.food) {
 			agi("obj_ItemMGMT").RecentEatenFoodDisp = agi("obj_ItemMGMT").ItemID[index];
 			agi("obj_ItemMGMT").RecentEatenFoodDispID = index;
 			agi("obj_ItemMGMT").RecentEatenFood = index;	
