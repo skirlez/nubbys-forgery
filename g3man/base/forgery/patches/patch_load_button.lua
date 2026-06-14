@@ -1,6 +1,6 @@
 
 patch('gml_Object_obj_LoadGameBtn_Create_0', function(t)
-	t:write(t:get_end(), [[
+	t:write(t:last_line(), [[
 		missing_resources = load_button_is_save_loadable()
 		mod_message = noone
 	]])

@@ -45,6 +45,8 @@ function get_current_language_id() {
 			return "pl"
 		case 10:
 			return "es-LA"
+		case 11:
+			return "no"
 	}
 }
 

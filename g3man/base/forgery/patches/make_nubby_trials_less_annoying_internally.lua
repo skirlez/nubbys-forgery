@@ -5,7 +5,7 @@ patch('gml_Object_obj_ChallengesMGMT_Create_0', function(t)
   i = t:find_line_with(i, 'ChallengeTN[14] = spr_CHTN_NT5')
   t:write(i, '}')
 
-  t:write(t:get_end(), [[
+  t:write(t:last_line(), [[
     NubbyTrialsTN[0] = spr_CHTN_NT1;
     NubbyTrialsTN[1] = spr_CHTN_NT2;
     NubbyTrialsTN[2] = spr_CHTN_NT3;
@@ -30,5 +30,3 @@ patch('gml_Object_obj_CHGoBtn_Alarm_1', function(t)
   i = t:find_line_with(1, 'if (obj_ChallengesMGMT.ChallengeOrder[obj_ChallengesMGMT.ChallengePage] < 10)')
   t:write_replace_substring(i, '< 10', '!= 10')
 end)
-
-

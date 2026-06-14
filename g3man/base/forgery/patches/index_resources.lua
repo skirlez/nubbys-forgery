@@ -15,5 +15,5 @@ FunctionToCall = {
 
 patch(targets, function(t)
 	local func = FunctionToCall[t.name]
-	t:write(t:get_end(), func .. '()')
+	t:write(t:last_line(), func .. '()')
 end)

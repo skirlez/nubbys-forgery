@@ -91,7 +91,7 @@ function register_items_for_gameplay() {
 			
 		object_set_sprite(obj, item.sprite)
 		agi("scr_Init_Item")(item_index,
-			agi("scr_Text")(item.display_name) + item.level == 2 ? "+" : "",
+			agi("scr_Text")(item.display_name) + (item.level == 2 ? "+" : ""),
 			obj,
 			item.level,
 			item.food,
@@ -157,4 +157,13 @@ function forgery_modded_item_effect(index) {
 		log_error($"Item {string_id} errored on trigger: {pretty_error(e)}")
 	}
 	global.cmod = previous_mod;
+}
+
+function forgery_get_item_desc_line_amount_fixed(desc, max_width) {
+	var font = draw_get_font();
+	return 6 + ((agi("scribble")(desc)
+		.starting_format(font_get_name(font), c_white)
+		.line_spacing(26, 26)
+		.wrap(max_width)
+		.get_height()) div 26);
 }
