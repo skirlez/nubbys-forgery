@@ -215,7 +215,7 @@ def parse_project_dependencies(arr, issues, _):
 	for dependency in arr:
 		ret = parse_dependency_or_return_string_error(dependency)
 		if type(ret) == str:
-			issues.append(str)
+			issues.append(ret)
 		else:
 			parsed_dependencies.append(ret)
 	return parsed_dependencies
@@ -264,7 +264,7 @@ class ProjectConfig:
 	class Publish:
 		archive_exclude: list[str] = field(default_factory=list, metadata={"optional": True})
 		as_profile: bool = field(default=False, metadata={"optional": True})
-	publish: Publish = field(default_factory=lambda: ProjectConfig.Publish(), metadata={"contract": Publish})
+	publish: Publish = field(default_factory=lambda: ProjectConfig.Publish(), metadata={"contract": Publish, "optional": True})
 	
 	@dataclass
 	class Fetch:
@@ -398,6 +398,7 @@ def construct_with_issues(json: dict[str, Any], dataclass: type, issues: list[st
 			ftype = field.metadata["type_override"]
 		if "contract" in field.metadata:
 			if (type(json[key]) is not dict):
+				print("her")
 				issues.append(type_error(key, ftype, type(json[ftype])))
 				continue
 			result = construct_with_issues(json[key], field.metadata["contract"], issues, f"{prefix}{key}.")
@@ -473,9 +474,10 @@ def generate_dependency_graph(frida_root, project_config: ProjectConfig) -> dict
 		graph[project_config] = projects
 		for dependency in project_config.fetch.dependencies:
 			path = dependency.get_path(dotfrida)
-			paths = dependency.get_frida_root_candidate_paths(path)
-			dependency_frida_root = check_frida_root_candidates(paths)
-			dependency_project_dict = get_project_dict(dependency_frida_root)
+			if (not os.path.exists(path)):
+				raise FridaException(f"Dependency \"{dependency}\" has not yet been fetched. Please fetch first.")
+			candidate_paths = dependency.get_frida_root_candidate_paths(path)
+			dependency_project_dict, dependency_frida_root = get_project_dict(path, candidate_paths)
 			dependency_project_config, issues = construct_project_config_with_issues(dependency_frida_root, dependency_project_dict)
 			if (dependency_project_config is None or issues.has_critical_issues()):
 				raise FridaException(f"Dependency \"{dependency}\" has issues:\n{issues.issues_as_string("frida-project-config.jsonc")}")
@@ -540,23 +542,23 @@ def get_yyp_filename(path):
 			return filename
 			
 	raise FridaException(f"No .yyp file found in {path}")
-def build_routine(frida_root: str, project_config: ProjectConfig, user_config : UserConfig, dependency_graph: dict[ProjectConfig, list[Project]], should_build_dependencies = True, force_build = False, verbose = False):
-	if (project_config.build is None):
-		return
-	build_config = project_config.build
-	assert type(build_config.options) is ProjectConfig.Build.GMS2Options
-	if (user_config.gms2 is None):
-		raise FridaException("Tried to build gms2 project, but gms2 user config is missing.")
-	build_gamemaker_project(frida_root, build_config.options, user_config.gms2, force_build=force_build, verbose=verbose)
+def build_routine(cli_frida_root: str, frida_root: str, project_config: ProjectConfig, user_config : UserConfig, dependency_graph: dict[ProjectConfig, list[Project]], should_build_dependencies = True, force_build = False, verbose = False):
+	if (project_config.build is not None):
+		build_config = project_config.build
+		assert type(build_config.options) is ProjectConfig.Build.GMS2Options
+		if (user_config.gms2 is None):
+			raise FridaException("Tried to build gms2 project, but gms2 user config is missing.")
+		build_gamemaker_project(cli_frida_root, frida_root, build_config.options, user_config.gms2, force_build=force_build, verbose=verbose)
 
 	if not should_build_dependencies:
 		return
 	for dependency in dependency_graph[project_config]:
 		if (dependency.config.build is not None):
-			build_routine(dependency.frida_root, dependency.config, user_config, dependency_graph, should_build_dependencies=project_config.fetch.recursive, force_build=force_build, verbose=verbose)
+			build_routine(cli_frida_root, dependency.frida_root, dependency.config, user_config, dependency_graph, should_build_dependencies=project_config.fetch.recursive, force_build=force_build, verbose=verbose)
 
 
 def build_gamemaker_project(
+		cli_frida_root: str,
 		frida_root: str,
 		build_options: ProjectConfig.Build.GMS2Options, 
 		gms2_user_config: UserConfig.Gms2,
@@ -597,7 +599,8 @@ def build_gamemaker_project(
 	try:
 		outputs_folder = f"{dotfrida}/gmac/outputs/{project_name}"	
 		cache_folder = f"{dotfrida}/gmac/cache/{project_name}"	
-		temp_folder = f"{dotfrida}/gmac/temp"	
+		temp_folder = f"{dotfrida}/gmac/temp"
+
 		for folder in [temp_folder, cache_folder, outputs_folder]:
 			os.makedirs(folder, exist_ok=True)
 			
@@ -657,7 +660,10 @@ def build_gamemaker_project(
 	returncode = program.wait()
 
 	if (returncode != 0):
-		raise FridaException(f"Errors given by asset compiler: \n{'\n'.join(errors)}")
+		if (len(errors) != 0):
+			raise FridaException(f"Asset compiler gave return code {returncode}, with the following errors: \n{'\n'.join(errors)}")
+		else:
+			raise FridaException(f"Asset compiler gave return code {returncode}, with no errors")
 	if not os.path.exists(f"{outputs_folder}/{project_name}.{GMAC_DATAFILE_EXT}"):
 		raise FridaException(f"Building failed to produce a datafile. Report this as an error!")
 
@@ -956,13 +962,16 @@ def check_frida_root_candidates(paths: list[str]) -> str:
 			return path
 	raise FridaException(f"No project config exists in any candidate path: {paths}")
 
-def get_project_dict(path: str):
-	frida_root = check_frida_root_candidates([path, f"{path}/g3man"])
+def get_project_dict(path: str, candidate_paths = None):
+	if (candidate_paths is None):
+		candidate_paths = [path, f"{path}/g3man"]
+	frida_root = check_frida_root_candidates(candidate_paths)
 	frida_root = os.path.abspath(frida_root)
 	try:
-		with open(f"{path}/frida-project-config.jsonc") as f:
-			config = json.loads(strip_comments_and_trailing_commas(f.read()))
-			return config, frida_root
+		with open(f"{frida_root}/frida-project-config.jsonc") as f:
+			json_string = strip_comments_and_trailing_commas(f.read())
+			project_dict = json.loads(json_string)
+			return project_dict, frida_root
 	except Exception as e:
 		raise FridaException(f"Error while reading project config:\n{e}")
 
@@ -971,8 +980,9 @@ def get_user_dict(frida_root):
 		raise FridaException(f"User config does not exist in {frida_root}")
 	try:
 		with open(f"{frida_root}/frida-user-config.jsonc") as f:
-			dict = json.loads(strip_comments_and_trailing_commas(f.read()))
-			return dict
+			json_string = strip_comments_and_trailing_commas(f.read())
+			user_dict = json.loads(json_string)
+			return user_dict
 	except Exception as e:
 		raise FridaException(f"Error while reading user config:\n{e}")
 
@@ -1188,7 +1198,7 @@ if __name__ == "__main__":
 
 		graph = generate_dependency_graph(cli_frida_root, project_config)
 		
-		build_routine(cli_frida_root, 
+		build_routine(cli_frida_root, cli_frida_root,
 			project_config, 
 			user_config,
 			graph,
@@ -1198,7 +1208,7 @@ if __name__ == "__main__":
 	parser_build.set_defaults(func=build)
 
 	parser_package = subparsers.add_parser("pack", help="Pack this project and dependencies to a folder")
-	def pack(namespace : argparse.Namespace):
+	def pack(_ : argparse.Namespace):
 		project_dict, cli_frida_root = get_project_dict(".")
 		user_dict = get_user_dict(cli_frida_root)
 		project_config, project_issues = construct_project_config_with_issues(cli_frida_root, project_dict)
@@ -1210,7 +1220,7 @@ if __name__ == "__main__":
 
 		graph = generate_dependency_graph(cli_frida_root, project_config)
 		
-		build_routine(cli_frida_root,
+		build_routine(cli_frida_root, cli_frida_root,
 		 	project_config, 
 			user_config, 
 			graph,
@@ -1236,7 +1246,7 @@ if __name__ == "__main__":
 
 		graph = generate_dependency_graph(cli_frida_root, project_config)
 		
-		build_routine(cli_frida_root,
+		build_routine(cli_frida_root, cli_frida_root,
 		 	project_config, 
 			user_config, 
 			graph,
@@ -1266,7 +1276,7 @@ if __name__ == "__main__":
 
 		graph = generate_dependency_graph(cli_frida_root, project_config)
 		
-		build_routine(cli_frida_root,
+		build_routine(cli_frida_root, cli_frida_root,
 		 	project_config, 
 			user_config, 
 			graph,

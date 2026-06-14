@@ -33,8 +33,6 @@
   ],
   "ForcedPrefabProjectReferences":[],
   "IncludedFiles":[
-    {"$GMIncludedFile":"","%Name":"hello.txt","CopyToMask":-1,"filePath":"datafiles","name":"hello.txt","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
-    {"$GMIncludedFile":"","%Name":"hello2.txt","CopyToMask":-1,"filePath":"datafiles/nested","name":"hello2.txt","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
   ],
   "isEcma":false,
   "LibraryEmitters":[],
