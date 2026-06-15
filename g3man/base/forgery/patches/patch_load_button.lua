@@ -1,3 +1,4 @@
+local patch = (require "g3man").patch
 
 patch('gml_Object_obj_LoadGameBtn_Create_0', function(t)
 	t:write(t:last_line(), [[
@@ -5,7 +6,6 @@ patch('gml_Object_obj_LoadGameBtn_Create_0', function(t)
 		mod_message = noone
 	]])
 end)
-
 
 
 patch('gml_Object_obj_LoadGameBtn_Step_0', function(t)

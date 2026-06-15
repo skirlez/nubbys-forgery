@@ -1,5 +1,6 @@
-patch('gml_Object_obj_ChallengesMGMT_Create_0', function(t)
+local patch = (require "g3man").patch
 
+patch('gml_Object_obj_ChallengesMGMT_Create_0', function(t)
   local i = t:find_line_with(1, 'ChallengeTN[10] = spr_CHTN_NT1')
   t:write(i, 'if false {')
   i = t:find_line_with(i, 'ChallengeTN[14] = spr_CHTN_NT5')

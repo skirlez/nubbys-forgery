@@ -13,7 +13,6 @@ import subprocess
 from typing import *
 import urllib.request
 from dataclasses import *
-from datetime import datetime
 
 FRIDA_VERSION = 6
 
@@ -77,7 +76,7 @@ class Dependency():
 	def __init__(self):
 		self.path_offset = ""
 		pass
-	def get_path(self, _) -> str:
+	def get_path(self, dotfrida) -> str:
 		return ""
 	def needs_download(self) -> bool:
 		return True
@@ -96,7 +95,7 @@ class PathDependency(Dependency):
 	def __init__(self, path):
 		self.path = path
 		self.path_offset = ""
-	def get_path(self, _) -> str:
+	def get_path(self, dotfrida) -> str:
 		return self.path
 	def needs_download(self) -> bool:
 		return False
@@ -246,6 +245,48 @@ class Issues:
 		print(self.issues_as_string(filename))
 
 
+project_config_template = """// This file is the project config. This file isn't personal to any user and should be shared by everyone working on this mod.
+//
+// You *can* use backslashes when filling out paths, but they must be escaped, i.e. you have to write "\\" instead of "\" every time.
+// Save yourself the hassle and use forward slashes.
+//
+// Frida wiki entry: https://github.com/skirlez/frida/wiki/Project-Config
+{
+	// Name that gets printed out when Frida mentions this project.
+	// It is not important.
+	"name": "",
+
+	// Example build strategy for GameMaker (gms2 and above) projects:
+	"build": {
+		// Where to export the project's datafile inside the output mods folder.
+		// This path is usually set to "(your mod's ID)/mod_data.win"
+		// So then you can reference it in your mod.json file.
+		"export_path": "",
+		
+		"type": "gms2",
+		"options": {
+			// (Relative!) path to the GameMaker project.
+			"project_path": "",
+			// Runtime version this project was made for
+			"runtime_version": "",
+		},
+	},
+
+	// Testing profile:
+	// When you apply your mod to the game using `frida.py apply`,
+	// frida generates a profile using the following block.
+	"profile": {
+		// Mod order/priority
+		// You should put the ID of your mod and its dependencies here.
+		// Earlier in the list means higher priority.		
+		"mod_order": ["mod_id_here"],
+	},
+
+	// Don't change this number.
+	"format_version": 2,
+}
+"""
+
 @dataclass(eq=False) # need eq=False for dicts
 class ProjectConfig:
 	name : str
@@ -262,7 +303,7 @@ class ProjectConfig:
 	
 	@dataclass
 	class Publish:
-		archive_exclude: list[str] = field(default_factory=list, metadata={"optional": True})
+		exclude: list[str] = field(default_factory=list, metadata={"optional": True})
 		as_profile: bool = field(default=False, metadata={"optional": True})
 	publish: Publish = field(default_factory=lambda: ProjectConfig.Publish(), metadata={"contract": Publish, "optional": True})
 	
@@ -309,6 +350,41 @@ class Project:
 	
 ## user config ##
 
+user_config_template = """// This file is the user config. This file is personal to you and your computer, and should not be shared with others or committed with Git.
+//
+// You *can* use backslashes when filling out paths, but they must be escaped, i.e. you have to write "\\" instead of "\" every time.
+// Save yourself the hassle and use forward slashes.
+//
+// Frida wiki entry: https://github.com/skirlez/frida/wiki/User-Config
+{
+	// Fill this part out if you want to build GameMaker (gms2 and above) projects.
+	"gms2": {
+		// Linux: Likely is /home/USER/.local/share/GameMakerStudio-Beta/Cache
+		// Windows: Likely is C:/ProgramData/GameMakerStudio2/Cache
+		"cache_path": "",
+	},
+
+	// Fill this part out if you want to be able to apply your mod to the game using Frida.
+	"apply": {
+		// The path to g3man's executable file.
+		// https://github.com/skirlez/g3man/releases		
+		"g3man_path": "",
+		
+		"game_path": "",
+
+		// The name of the new datafile g3man will put in the game folder, with mods applied to it.
+		"output_datafile_name": "data.win",
+		
+		// Path to the game's clean/unmodified/vanilla datafile.
+		// Take notice: It is recommended to not just put the game's datafile (data.win) here, it can easily get modified
+		// by accident. It's better to copy the clean version of it elsewhere, and provide the path to that location.
+		"clean_datafile_path": "",
+	},
+
+	"check_for_updates": true,  
+	"format_version": 2
+}
+"""
 
 @dataclass
 class UserConfig:
@@ -317,7 +393,7 @@ class UserConfig:
 	@dataclass
 	class Gms2:
 		cache_path : str
-		user_directory_or_license_path : str
+		#user_directory_or_license_path : str
 	gms2 : Gms2 | None =  field(default=None, metadata={"contract": Gms2, "optional": True})
 
 	@dataclass
@@ -332,6 +408,7 @@ class UserConfig:
 		@dataclass
 		class SteamLaunchOptions:
 			app_id : int
+			steam_executable_path: str
 		launch_options : ExeLaunchOptions | SteamLaunchOptions | None = (
 			field(default=None, metadata = {
 				"contract_switch_field": "launch_type",
@@ -441,28 +518,6 @@ def construct_with_issues(json: dict[str, Any], dataclass: type, issues: list[st
 		set_attribute(instance, key, json[key])
 	return instance
 
-frida_template_project_config = """
-{
-	"dependencies": [],
-	"recursive_dependencies" : true,
-	
-	"build": {
-		"export_path" : "",
-		"method": "",
-		"method_options": {
-
-		}
-	},
-	"mod_order" : [""],
-
-	"package": {
-		"zip_exclude" : [""],
-		"modded_save_name" : ""
-	},
-
-	"format_version": 2
-}
-"""
 
 def generate_dependency_graph(frida_root, project_config: ProjectConfig) -> dict[ProjectConfig, list[Project]]:
 	graph : dict[ProjectConfig, list[Project]] = dict()
@@ -565,7 +620,7 @@ def build_gamemaker_project(
 		force_build = False,
 		verbose=False):
 
-	dotfrida = os.path.abspath(f"{frida_root}/.frida")
+	dotfrida = os.path.abspath(f"{cli_frida_root}/.frida")
 	gamemaker_project_path = f"{frida_root}/{build_options.project_path}"
 	yyp_filename = get_yyp_filename(gamemaker_project_path)
 	
@@ -624,14 +679,15 @@ def build_gamemaker_project(
 				"/zpex", # "enable zp mode" (tries loading kernel32 otherwise?)
 				"/cins", # case insensitive
 				"/nru", # NoRemoveUnused
-				"/trun"
+				# "target mask". I found documentation for it in https://github.com/YAL-GMEdit/builder/blob/master/BuilderCompile.js, (thanks YAL)
+				# 1<<6 is windows, which is what we'll leave it at for now
+				f"/tgt={1<<6}",
 				"/mv=1", # "major version"
 				"/iv=0", # "minor version"
 				"/rv=0", # "release version"
 				"/bv=0", # "build version"
 				"/j=8", # number of processors to use for parallel tasks (TODO: why not increase this to 16)
 				"/sh=True", # enable / disable Short Circuit evaluation on VM 
-				"/nobuiltin"
 				#	f"/zpuf={gms2_user_config.user_directory_or_license_path}", "zp user folder"
 				f"/td={temp_folder}", # "temp base directory"
 				f"/cd={cache_folder}", # cache directory
@@ -783,7 +839,7 @@ def publish_as_zip(cli_frida_root, project_config: ProjectConfig):
 	
 	if os.path.exists(f"{cli_frida_root}/out.zip"):
 		os.remove(f"{cli_frida_root}/out.zip")
-	normalized_zip_exclude = [os.path.normpath(path) for path in project_config.publish.archive_exclude]
+	normalized_zip_exclude = [os.path.normpath(path) for path in project_config.publish.exclude]
 	
 	if project_config.publish.as_profile:
 		with open(f"{out_folder}/jsons/profile.json", "rt") as f:
@@ -838,18 +894,27 @@ def make_game_json_dict(apply: UserConfig.Apply):
 			p["executable_path"] = apply.launch_options.path
 		case UserConfig.Apply.SteamLaunchOptions:
 			assert type(apply.launch_options) is UserConfig.Apply.SteamLaunchOptions
-			p["executable_type"] = 0
+			p["executable_type"] = 1
 			p["executable_steam_app_id"] = apply.launch_options.app_id
 	p["output_datafile_name"] = apply.output_datafile_name
 	return p
 
 	
-def apply_routine(cli_frida_root, apply_config: UserConfig.Apply):
+def apply_routine(cli_frida_root, apply_config: UserConfig.Apply, launch: bool):
 	game_json = make_game_json_dict(apply_config)
 	out_folder = f"{cli_frida_root}/out"
 	with open(f"{out_folder}/jsons/game.json", "w") as f:
 		json.dump(game_json, f)
-	print("---Applying the mod---")
+
+	
+	print("Applying the mod(s)")
+
+	bonus_launch_arguments = []
+	if launch:
+		bonus_launch_arguments.append("--launch")
+		if type(apply_config.launch_options) is UserConfig.Apply.SteamLaunchOptions:
+			bonus_launch_arguments.append("--steam")
+			bonus_launch_arguments.append(apply_config.launch_options.steam_executable_path)
 	try:
 		status = subprocess.run(
 			[apply_config.g3man_path, "apply",
@@ -858,7 +923,8 @@ def apply_routine(cli_frida_root, apply_config: UserConfig.Apply):
 				"--profile-json", f"{out_folder}/jsons/profile.json",	
 				"--mods-folder", f"{out_folder}/mods",
 				"--clean_data", apply_config.clean_datafile_path
-			],
+			] + bonus_launch_arguments,
+			
 			cwd = ".")
 	except Exception as e:
 		print("Failed to launch g3man. Do you have all your variables set correctly?\n" + str(e))
@@ -869,41 +935,6 @@ def apply_routine(cli_frida_root, apply_config: UserConfig.Apply):
 		exit()
 
 ### cli
-
-def is_executable(path: str):
-	if os.name == "nt":
-		return path.endswith(".exe") or path.endswith(".bat")
-	elif os.access(path, os.X_OK): # this ends up being true for almost every file for me, but i don't know any better way to check
-		return path
-
-def try_starting_game():
-	game_path = user_dict["game_path"]
-	executables = []
-	for file in os.listdir(game_path):
-		if is_executable(f"{game_path}/{file}"):
-			executables.append(f"{game_path}/{file}")
-	start_game_command = user_dict["start_game_command"]
-	
-	if len(executables) != 1:
-		if start_game_command == "":
-			print("Couldn't determine which file is the executable. Please supply \"start_game_command\" in the user config to tell Frida what to do to launch the game.")
-			return
-		cmd = start_game_command
-	else:
-		cmd = executables[0]
-
-		
-	
-	print(f"Launching game. Running command: {cmd}")
-	try:
-		status = subprocess.run(
-			cmd,
-			cwd = game_path,
-			shell = True,
-		)
-	except Exception as e:
-		print(e)
-		pass
 
 
 def strip_comments_and_trailing_commas(str: str):
@@ -1071,7 +1102,7 @@ def check_update(manual = False):
 			content = json.loads(response.read().decode('utf-8'))
 			tag_name = ''.join(c for c in content["tag_name"] if c.isdigit())
 			tag_number = int(tag_name)
-	except Exception as e:
+	except Exception:
 		print("Error occured while checking for updates. You should probably check manually. See you tomorrow!")
 		save_update_timestamp(86400)
 		return
@@ -1098,8 +1129,8 @@ def is_help(arguments):
 	return "-h" in arguments or "--help" in arguments
 
 def python_version_routine():
-	if sys.version_info.major < 3 or sys.version_info.minor < 6:
-		print("Frida requires Python 3.6 at least to run. Your python version: " + str(sys.version_info.major) + "." + str(sys.version_info.minor) + "." + str(sys.version_info.micro))
+	if sys.version_info.major < 3 or sys.version_info.minor < 12:
+		print("Frida requires Python 3.12 at least to run. Your python version: " + str(sys.version_info.major) + "." + str(sys.version_info.minor) + "." + str(sys.version_info.micro))
 		exit()
 
 def fetch_routine(cli_frida_root, name, obtain_fetch_config):
@@ -1173,6 +1204,21 @@ if __name__ == "__main__":
 	parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 	subparsers = parser.add_subparsers(title="Actions list", metavar="")
 
+	def init(_):
+		if (os.path.exists("frida-project-config.jsonc")):
+			print("Project config already exists, skipping...")
+		else:
+			with (open("frida-project-config.jsonc", "w") as f):
+				f.write(project_config_template)
+		if (os.path.exists("frida-user-config.jsonc")):
+			print("User config already exists, skipping...")
+		else:
+			with (open("frida-user-config.jsonc", "w") as f):
+				f.write(user_config_template)
+		
+	parser_init = subparsers.add_parser("init", help="Create blank user and project configs")
+	parser_init.set_defaults(func=init)
+	
 	parser_fetch = subparsers.add_parser("fetch", help="Fetch this project's dependencies")
 
 	def fetch(_):
@@ -1282,13 +1328,16 @@ if __name__ == "__main__":
 			graph,
 			project_config.fetch.recursive)
 			
-		pack_routine(cli_frida_root, project_config, graph)
+		pack_routine(cli_frida_root, project_config, graph, linkbase=namespace.linkbase)
 		
-		apply_routine(cli_frida_root, user_config.apply)
-		
-	parser_apply = subparsers.add_parser("apply", help="Apply this project and dependencies to a game")
-	parser_apply.set_defaults(func=apply)
+		apply_routine(cli_frida_root, user_config.apply, launch=namespace.startgame)
 
+		
+	parser_apply = subparsers.add_parser("apply", help="Apply this project and dependencies, and (optionally) launch the game")
+	parser_apply.add_argument("-l", "--linkbase", action="store_true", help="Symbolically link files to the \"base\" folder instead of copying. On Windows, this uses hard links.")
+	parser_apply.add_argument("-s", "--startgame", action="store_true", help="Start the game after applying.")
+	parser_apply.set_defaults(func=apply)
+	
 	def validate(_):
 		project_dict, cli_frida_root = get_project_dict(".")
 		user_dict = get_user_dict(cli_frida_root)
@@ -1313,158 +1362,3 @@ if __name__ == "__main__":
 		print("*Frida error!*")
 		print(e.message)
 		exit(1)
-# create = "--createconfig" in sys.argv
-	
-	# project_dict, cli_frida_root = project_dict_routine(create)
-	# dotfrida = f"{cli_frida_root}/.frida"
-	# user_dict = user_dict_routine(create)
-	
-	# if project_dict is None or user_dict is None:
-	# 	if not create:
-	# 		print("Configuration files are missing in this directory. You can run \"frida.py --createconfig\" to create them.")
-	# 		exit()
-	# 	print("Configuration file(s) have been created.")
-	# 	print("You can run \"frida.py validate\" in order to validate your config(s), after filling them.")
-	# 	exit()
-	
-	# if (len(sys.argv) < 2):
-	# 	bad_usage()
-		
-	# argument = sys.argv[1]
-	# if argument == "--version" or argument == "-v":
-	# 	print(f"Frida version {frida_version}")
-	# 	exit()
-	# if argument == "--help" or argument == "-h":
-	# 	print(usage)
-	# 	print("Perform ACTION in accordance to frida-project-config.jsonc and frida-user-config.jsonc in the same directory.")
-	# 	print()
-	# 	print("Actions list:")
-	# 	print("    fetch")
-	# 	print("    build")
-	# 	print("    package [--zip]")
-	# 	print("    apply [--linkbase] [--startgame]")
-	# 	print("    validate")
-	# 	print("    check_updates")
-	# 	print()
-	# 	print("You can use '--help' on each of the actions to learn more about them and their options.")
-	# 	exit()
-
-	# subarguments = sys.argv[2:]
-	# opname = argument
-	# if argument == "fetch":
-	# 	if is_help(subarguments):
-	# 		print("frida.py fetch - Fetches the mod's dependencies.")
-	# 		exit()
-	# 	project_config = construct_project_config_with_issues(cli_frida_root, project_dict)
-			
-	# 	if (project_config.fetch is None):
-	# 		print("This project has no build config set!")
-	# 		exit()
-	# 	fetch_dependencies(project_config.fetch)
-	# 	exit()
-	# if argument == "build":
-	# 	if is_help(subarguments):
-	# 		print("frida.py build - Builds the mod's and dependencies' GameMaker projects.")
-	# 		print()
-	# 		print("This action will attempt to build the projects regardless of the previous builds' hashes.")
-	# 		print()
-	# 		print("The output artifacts will be in .frida/igor.")
-	# 		print()
-	# 		exit()
-		
-	# 	if (should_check_for_update()):
-	# 		check_update()
-	# 	exit()
-	# if argument == "package":
-	# 	if is_help(subarguments):
-	# 		print("frida.py package - Packages this mod.")
-	# 		print()
-	# 		print("This action will build the GameMaker project(s) if necessary, and package this")
-	# 		print("mod and its dependencies as a profile folder \"out\", for distribution or application.")
-	# 		print()
-	# 		print("Arguments:")
-			
-	# 		print("  -z, --zip      After creating the \"out\" folder, compress it into a ZIP (as \"out.zip\")")
-	# 		indent = "                   "
-	# 		print(f"{indent}This will exclude any files found in the project config's \"zip_exclude\" field.")
-	# 		print(f"{indent}Additionally, if \"profile.json\" isn't excluded, the ZIP will have a root folder,")
-	# 		print(f"{indent}with the same name as the profile's ID.")
-	# 		exit()
-	# 	project_config = validation_routine(cli_frida_root, project_dict, validate_user=True)
-	# 	if (project_config.build is not None):
-	# 		build_routine(cli_frida_root, project_config.build)
-	# 	recreate_out_folder(cli_frida_root)
-	# 	package_routine(cli_frida_root, project_config, linkbase=False)
-	# 	zip = "-z" in subarguments or "--zip" in subarguments 
-	# 	if zip:
-	# 		zip_out_folder(cli_frida_root, project_config)
-	# 	print(f"Done!")
-	# 	if (should_check_for_update()):
-	# 		check_update()
-	# 	exit()
-	# if argument == "apply":
-	# 	if is_help(subarguments):
-	# 		print("frida.py apply [ARGUMENTS] - Applies this mod.")
-	# 		print()
-	# 		print("This action will build the GameMaker project(s) if necessary, package the mod and its dependencies,")
-	# 		print("And then call g3man to apply it on a GameMaker game.")
-	# 		print()
-	# 		print("Arguments:")
-			
-	# 		print("  -l, --linkbase      When packaging, link files in \"out\" to \"base\" instead of copying")
-	# 		indent = "                        "
-	# 		print(f"{indent}This is useful if your mod has included files it reads from at runtime,")
-	# 		print(f"{indent}as this argument effectively makes it so any changes to files in \"base\"")
-	# 		print(f"{indent}are visible to the modded game immediately.")
-	# 		print(f"{indent}Note: This argument uses hard links on Windows")
-	# 		print(f"{indent}and symlinks everywhere else.")
-	# 		print()
-	# 		print("  -s, --startgame     After applying, attempt to launch the game")
-			
-	# 		print(f"{indent}Frida will try to open any executable found in the game's folder.")
-	# 		print(f"{indent}If Frida cannot determine which executable to launch,")
-	# 		print(f"{indent}you must set \"start_game_command\" in frida-user-config.jsonc")
-	# 		print(f"{indent}which Frida will execute in the game's folder.")
-	# 		exit()
-	# 	linkbase = "-l" in subarguments or "--linkbase" in subarguments 
-	# 	project_config = validation_routine(cli_frida_root, project_dict, validate_user=True)
-	# 	if (project_config.build is not None):
-	# 		build_routine(cli_frida_root, project_config.build)
-	# 	recreate_out_folder(cli_frida_root)
-	# 	package_routine(cli_frida_root, project_config, linkbase=linkbase)
-	# 	apply_mod()
-		
-	# 	startgame = "-s" in subarguments or "--startgame" in subarguments 
-	# 	if startgame:
-	# 		try_starting_game()
-	# 	print("Done! Your mod has been applied.")
-	# 	if (should_check_for_update()):
-	# 		check_update()
-	# 	exit()
-	# if argument == "validate":
-	# 	if is_help(subarguments):
-	# 		print("frida.py validate - Validates config files in the current directory.")
-	# 		print()
-	# 		print("This action will go over some of the fields in frida-user-config.jsonc and frida-project-config.jsonc,")
-	# 		print("and will let you know if there's anything wrong with them.")
-	# 		exit()
-	# 	_, project_issues, project_warnings = construct_project_config_with_issues(cli_frida_root, project_dict)
-	# 	_, user_issues, user_warnings = construct_user_config_with_issues(user_dict)
-	# 	combination_issues, combination_warnings = validate_combination(user_dict, project_dict)
-		
-	# 	print_issues(project_issues + project_warnings, "frida-project-config.jsonc")
-	# 	print_issues(user_issues + user_warnings, "frida-user-config.jsonc")
-	# 	print_issues(combination_issues + combination_warnings, "Combination of user and project configs")
-	# 	exit()
-	# if argument == "check_updates":
-	# 	if is_help(subarguments):
-	# 		print("frida.py check_updates - Checks for updates to Frida.")
-	# 		print()
-	# 		print("This action will check https://github.com/skirlez/frida/releases,")
-	# 		print("And print a message if there's a newer version.")
-	# 		exit()
-	# 	check_update(manual=True)
-	# 	exit()
-
-
-	# bad_usage()

@@ -1,3 +1,4 @@
+local patch = (require "g3man").patch
 -- Instantiate the modloader object
 local targets = 'gml_Object_obj_Debug_Create_0'
 patch(targets, function(t)

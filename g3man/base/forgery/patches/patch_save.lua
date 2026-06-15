@@ -1,3 +1,4 @@
+local patch = (require "g3man").patch
 -- Save "Highscore" save for forgery resources
 local targets = 'gml_Object_obj_Saver_Alarm_0'
 patch(targets, function(t)

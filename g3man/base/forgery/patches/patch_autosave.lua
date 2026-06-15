@@ -1,3 +1,4 @@
+local patch = (require "g3man").patch
 -- Load forgery autosave, passing in old data to fix indices
 
 local targets = 'gml_GlobalScript_scr_Load_AutoSave'

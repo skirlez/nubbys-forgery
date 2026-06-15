@@ -1,3 +1,4 @@
+local patch = (require "g3man").patch
 
 local targets = 'gml_Object_obj_SupervisorPreviewMAIN_Step_0'
 

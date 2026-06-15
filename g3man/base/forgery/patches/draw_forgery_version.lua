@@ -1,5 +1,5 @@
-local targets = { 'gml_Object_obj_BuildInfo_Draw_0' }
-patch(targets, function(t)
+local patch = (require "g3man").patch
+patch('gml_Object_obj_BuildInfo_Draw_0', function(t)
 	local i = t:find_line_with(1, 
 		'scr_Text("gameversion"'
 	)

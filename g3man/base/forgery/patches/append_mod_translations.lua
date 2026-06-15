@@ -1,3 +1,5 @@
+local patch = (require "g3man").patch
+
 -- Add mod translation keys
 local targets = 'gml_GlobalScript_scr_InitTranslations'
 patch(targets, function(t)
