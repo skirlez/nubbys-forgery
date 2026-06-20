@@ -1,8 +1,0 @@
-// Enable DevMode depending on our function, which skips intro
-meta:
-targets = 'gml_Object_obj_Debug_Create_0'
-patch:
-move_to_end()
-write(
-	'DevMode = is_console_and_devmode_enabled()'
-)

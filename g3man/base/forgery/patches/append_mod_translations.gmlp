@@ -1,8 +1,0 @@
-// Add mod translation keys
-meta:
-targets = 'gml_GlobalScript_scr_InitTranslations'
-patch:
-move(2)
-enter_scope()
-find_all_lines_with('break')
-write_before('append_mod_translations()')

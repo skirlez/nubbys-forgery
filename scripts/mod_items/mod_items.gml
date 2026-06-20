@@ -158,3 +158,12 @@ function forgery_modded_item_effect(index) {
 	}
 	global.cmod = previous_mod;
 }
+
+function forgery_get_item_desc_line_amount_fixed(desc, max_width) {
+	var font = draw_get_font();
+	return 6 + ((agi("scribble")(desc)
+		.starting_format(font_get_name(font), c_white)
+		.line_spacing(26, 26)
+		.wrap(max_width)
+		.get_height()) div 26);
+}

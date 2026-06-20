@@ -25,6 +25,25 @@ function registry_clear(registry) {
 		registry_clear_type(registry, type)
 	}
 }
+
+
+
+var item = mod_registry_get_right(global.registry, mod_resources.item, "mod_id:item_name")
+var index = mod_registry_get_left(global.index_registry, mod_resources.item, item)
+
+var index = mod_registries_exchange(global.registry, global.index_registry, mod_resources.item, "mod_id:item_name")
+var found = false;
+with (obj_ItemParent) {
+	if (MyItemID == index) {
+		found = true;
+		break;
+	}
+}
+
+function get_item_index_from_name(str) {
+	return mod_registries_exchange	
+}
+
 function registry_clear_type(registry, type) {
 	bimap_clear(registry[type]);
 }

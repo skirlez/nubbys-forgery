@@ -34,12 +34,10 @@ jobs:
           cd g3man
           echo "User config:"
           cat frida-user-config.jsonc
-          python3 frida.py package
-          rm out/profile.json
+          python3 frida.py pack
           
-      # can't use `frida.py package --zip` or it would create nested zips, so we just remove out/profile.json in the earlier step
       - name: Upload g3man mod
         uses: actions/upload-artifact@v6
         with:
           name: forgery
-          path: g3man/out
+          path: g3man/out/mods

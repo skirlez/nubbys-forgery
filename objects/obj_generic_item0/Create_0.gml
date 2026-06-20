@@ -49,6 +49,7 @@ if (item.food) {
 	CrumbFxCol2 = item.food_crumb_colors[1]
 }
 
+
 MyItemBacker = -1
 global.cmod = mod_of_origin;
 try {
