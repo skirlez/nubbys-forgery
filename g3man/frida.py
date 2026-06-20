@@ -364,7 +364,7 @@ user_config_template = """// This file is the user config. This file is personal
 		"cache_path": "",
 	},
 
-	// Fill this part out if you want to be able to apply your mod to the game using Frida.
+	// Fill this part out if you want to be able to apply your mod to the game using Frida. Or delete this whole block if you don't want that.
 	"apply": {
 		// The path to g3man's executable file.
 		// https://github.com/skirlez/g3man/releases		
@@ -910,7 +910,10 @@ def apply_routine(cli_frida_root, apply_config: UserConfig.Apply, launch: bool):
 	print("Applying the mod(s)")
 
 	bonus_launch_arguments = []
+	
 	if launch:
+		if apply_config.launch_options is None:	
+			raise FridaException("Cannot launch without \"apply.launch_options\" being defined in the user config.")
 		bonus_launch_arguments.append("--launch")
 		if type(apply_config.launch_options) is UserConfig.Apply.SteamLaunchOptions:
 			bonus_launch_arguments.append("--steam")
@@ -1317,7 +1320,7 @@ if __name__ == "__main__":
 		assert user_config is not None
 
 		if (user_config.apply is None):
-			print("Apply config is not defined! TODO")
+			print("Cannot apply without \"apply\" being filled in the user config.")
 			exit(1)
 
 		graph = generate_dependency_graph(cli_frida_root, project_config)
