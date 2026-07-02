@@ -47,6 +47,10 @@ function get_current_language_id() {
 			return "es-LA"
 		case 11:
 			return "no"
+		case 12:
+			return "ru"
+		case 13:
+			return "es"
 	}
 }
 
