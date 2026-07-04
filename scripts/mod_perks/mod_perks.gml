@@ -1,16 +1,4 @@
-// For catspeak
 function mod_register_perk(perk, perk_id, wod = global.cmod) {
-	if !mod_is_id_component_valid(perk_id) {
-		log_error($"Mod {wod.mod_id} tried to register an item with invalid ID {perk_id}")
-		return;
-	}
-	if bimap_right_exists(global.registry[mod_resources.perk], perk) {
-		var current_id = bimap_get_left(global.registry[mod_resources.perk], perk)
-		log_error($"Mod {wod.mod_id} tried to register a perk struct with ID {perk_id},"
-			+ $" but this struct has already been registered prior to {current_id}! Each struct registered must be unique.")
-		return;
-	}
-	
 	static perk_contract = {
 		display_name : "",
 		description : "",
@@ -24,35 +12,15 @@ function mod_register_perk(perk, perk_id, wod = global.cmod) {
 		on_create : global.empty_method,
 		on_trigger : global.empty_method,
 	}
-
-	var compliance = get_struct_compliance_with_contract(perk, perk_contract)
-	if array_length(compliance.missing) > 0 || array_length(compliance.mismatched_types) > 0 {
-		log_error($"Perk {perk_id} from {wod.mod_id} has bad variables!\n" 
-			+ generate_compliance_error_text(perk, perk_contract, compliance)
-			+ "\nThe perk is not registered.")
-			
-		return;
-	}
 	
 	static optional_variables = {
 		manage_own_trigger : false,
+		display_name_args : [],
+		description_args : ["\n"]
 	}
-	var compliance = get_struct_compliance_with_contract(perk, optional_variables)
-	if array_length(compliance.mismatched_types) > 0 {
-		compliance.missing = [];
-		log_error($"Perk {perk_id} from {wod.mod_id} has bad variables!\n" 
-			+ generate_compliance_error_text(perk, optional_variables, compliance)
-			+ "\nThe perk is not registered.")
-		return;
-	}
-	
-	initialize_missing(perk, optional_variables)
-	
-
-	var full_id = $"{wod.mod_id}:{perk_id}"
-	bimap_set(global.registry[mod_resources.perk], full_id, perk)
-	array_push(wod.perks, perk)
-	log_info($"Perk {full_id} registered");
+	var success = register_generic(mod_resources.perk, perk, perk_id, perk_contract, optional_variables, empty_function, "Perk", "a perk", wod.perks, wod)
+	if !success
+		return undefined
 	return perk;
 }
 
@@ -71,7 +39,7 @@ function register_perks_for_gameplay() {
 		object_set_sprite(obj, perk.sprite)
 			
 		agi("scr_Init_Perk")(perk_index,
-			agi("scr_Text")(perk.display_name),
+			script_execute_ext(agi("scr_Text"), array_concat([perk.display_name], perk.display_name_args)),
 			obj,
 			perk.game_event, 
 			perk.tier, 
@@ -79,7 +47,7 @@ function register_perks_for_gameplay() {
 			perk.pool,
 			perk.trigger_fx_color, 
 			perk.additional_info_type,
-			agi("scr_Text")(perk.description, "\n"))
+			script_execute_ext(agi("scr_Text"), array_concat([perk.description], perk.description_args)))
 			
 		assign_index_to_resource(mod_resources.perk, perk, perk_index)
 		log_info($"Perk {perk_ids[i]} has been indexed: {perk_index}")

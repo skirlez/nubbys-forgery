@@ -43,6 +43,7 @@ function create_api_objects() {
 			challenge : mod_resources.challenge
 		},
 	
+		get_resources_with_tag : mod_get_resources_with_tag
 	});
 	global.forgery_7 = global.forgery_9
 }

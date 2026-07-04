@@ -55,6 +55,7 @@
     {"name":"mod_sounds","order":20,"path":"scripts/mod_sounds/mod_sounds.yy",},
     {"name":"mod_sprites","order":15,"path":"scripts/mod_sprites/mod_sprites.yy",},
     {"name":"mod_supervisors","order":2,"path":"scripts/mod_supervisors/mod_supervisors.yy",},
+    {"name":"mod_tags","order":5,"path":"scripts/mod_tags/mod_tags.yy",},
     {"name":"mod_translations","order":7,"path":"scripts/mod_translations/mod_translations.yy",},
     {"name":"scr_catspeak_environment","order":4,"path":"scripts/scr_catspeak_environment/scr_catspeak_environment.yy",},
     {"name":"scr_catspeak_init","order":5,"path":"scripts/scr_catspeak_init/scr_catspeak_init.yy",},

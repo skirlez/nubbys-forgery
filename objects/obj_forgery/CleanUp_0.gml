@@ -4,6 +4,7 @@ ds_map_destroy(global.forgery_game_events)
 
 registry_destroy(global.registry)
 registry_destroy(global.index_registry)
+tags_destroy(global.tags)
 ds_map_destroy(global.mod_id_to_mod_map)
 
 log_info("Forgery Clean Up Event done")

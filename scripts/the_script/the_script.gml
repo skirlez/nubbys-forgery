@@ -41,7 +41,7 @@ function create_mod(mod_folder_name) {
 				compile_all_code_on_load : false,
 				target_version : 0
 			}
-		},
+		}
 	}
 	
 	var compliance = get_struct_compliance_with_contract(wod, mod_contract)
@@ -332,6 +332,7 @@ function clear_all_mods() {
 	ds_map_clear(global.mod_id_to_mod_map)
 	registry_clear(global.registry)
 	registry_clear(global.index_registry)
+	tags_clear(global.tags)
 }
 
 function sort_by_mod_order(list) {
@@ -411,3 +412,4 @@ function get_nf_loaded_string() {
 		+ $"{bimap_size(global.registry[mod_resources.supervisor])} supervisor(s), "
 		+ $"{bimap_size(global.registry[mod_resources.challenge])} challenges(s))"
 }
+

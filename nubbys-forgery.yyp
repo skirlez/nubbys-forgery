@@ -77,6 +77,7 @@
     {"id":{"name":"mod_sounds","path":"scripts/mod_sounds/mod_sounds.yy",},},
     {"id":{"name":"mod_sprites","path":"scripts/mod_sprites/mod_sprites.yy",},},
     {"id":{"name":"mod_supervisors","path":"scripts/mod_supervisors/mod_supervisors.yy",},},
+    {"id":{"name":"mod_tags","path":"scripts/mod_tags/mod_tags.yy",},},
     {"id":{"name":"mod_translations","path":"scripts/mod_translations/mod_translations.yy",},},
     {"id":{"name":"scr_catspeak_codegen","path":"scripts/scr_catspeak_codegen/scr_catspeak_codegen.yy",},},
     {"id":{"name":"scr_catspeak_environment","path":"scripts/scr_catspeak_environment/scr_catspeak_environment.yy",},},

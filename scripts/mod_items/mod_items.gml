@@ -1,16 +1,4 @@
-// For catspeak
 function mod_register_item(item, item_id, wod = global.cmod) {
-	if !mod_is_id_component_valid(item_id) {
-		log_error($"Mod {wod.mod_id} tried to register an item with invalid ID {item_id}")
-		return;
-	}
-	if bimap_right_exists(global.registry[mod_resources.item], item) {
-		var current_id = bimap_get_left(global.registry[mod_resources.item], item)
-		log_error($"Mod {wod.mod_id} tried to register an item struct with ID {item_id},"
-			+ $" but this struct has already been registered prior to {current_id}! Each struct registered must be unique.")	
-		return;
-	}
-	
 	static item_contract = {
 		display_name : "",
 		description : "",
@@ -27,16 +15,6 @@ function mod_register_item(item, item_id, wod = global.cmod) {
 		on_create : global.empty_method,
 		on_trigger : global.empty_method,
 	}
-
-	
-	var compliance = get_struct_compliance_with_contract(item, item_contract)
-	if array_length(compliance.missing) > 0 || array_length(compliance.mismatched_types) > 0 {
-		log_error($"Item {item_id} from {wod.mod_id} has bad variables!\n" 
-			+ generate_compliance_error_text(item, item_contract, compliance)
-			+ "\nThe item is not registered.")
-		return;
-	}
-	
 	static optional_variables = {
 		on_step : global.empty_method,
 		on_round_init : global.empty_method,
@@ -46,30 +24,19 @@ function mod_register_item(item, item_id, wod = global.cmod) {
 		odds_weight_early : 5,
 		odds_weight_mid : 5,
 		odds_weight_end : 5,
+		display_name_args : [],
+		description_args : ["\n"],
 	}
-	var compliance = get_struct_compliance_with_contract(item, optional_variables)
-	if array_length(compliance.mismatched_types) > 0 {
-		compliance.missing = [];
-		log_error($"Item {item_id} from {wod.mod_id} has bad variables!\n" 
-			+ generate_compliance_error_text(item, optional_variables, compliance)
-			+ "\nThe item is not registered.")
-		return;
-	}
-
-	initialize_missing(item, optional_variables)
-	
-	if array_length(item.food_crumb_colors != 2) || !is_numeric(item.food_crumb_colors[0]) || !is_numeric(item.food_crumb_colors[1]) {
-		log_error($"Item {item_id} from {wod.mod_id} has bad variables!\n"
-		+ "If you are registering a food item, the \"food_crumb_colors\" array MUST have exactly two color values.")
-		return;
-	}
-	
-	var full_id = $"{wod.mod_id}:{item_id}"
-	
-	bimap_set(global.registry[mod_resources.item], full_id, item)
-	array_push(wod.items, item)
-	
-	log_info($"Item {full_id} registered {item.game_event == "Eat" ? "(as food)" : ""}");
+	var success = register_generic(mod_resources.item, item, item_id, item_contract, optional_variables, function(res, res_id, wod) {
+		if array_length(res.food_crumb_colors != 2) || !is_numeric(res.food_crumb_colors[0]) || !is_numeric(res.food_crumb_colors[1]) {
+			log_error($"Item {res_id} from {wod.mod_id} has bad variables!\n"
+				+ "If you are registering a food item, the \"food_crumb_colors\" array MUST have exactly two color values.")
+			return false;
+		}
+		return true;
+	}, "Item", "an item", wod.items, wod)
+	if !success
+		return undefined
 	return item;
 }
 
@@ -91,7 +58,7 @@ function register_items_for_gameplay() {
 			
 		object_set_sprite(obj, item.sprite)
 		agi("scr_Init_Item")(item_index,
-			agi("scr_Text")(item.display_name) + (item.level == 2 ? "+" : ""),
+			script_execute_ext(agi("scr_Text"), array_concat([(item.display_name) + (item.level == 2 ? "+" : "")], item.display_name_args)),
 			obj,
 			item.level,
 			item.food,
@@ -103,7 +70,7 @@ function register_items_for_gameplay() {
 			item.pair_id, 
 			item.game_event, 
 			item.alt_game_event,
-			agi("scr_Text")(item.description, "\n"))
+			script_execute_ext(agi("scr_Text"), array_concat([item.description], item.description_args)))
 			
 		agi("scr_Init_ItemExt")(item_index, 
 			item.odds_weight_early, item.odds_weight_mid, item.odds_weight_end)
@@ -166,4 +133,13 @@ function forgery_get_item_desc_line_amount_fixed(desc, max_width) {
 		.line_spacing(26, 26)
 		.wrap(max_width)
 		.get_height()) div 26);
+}
+// called from gml_Object_obj_Perk_MysteryBox_Create_0
+function add_items_to_mystery_box_perk() {
+	var items = mod_get_resources_with_tag(mod_resources.item, "forgery:mystery_box_friendly")
+	for (var i = 0; i < array_length(items); i++) {
+		var index = mod_registry_get_left(global.index_registry, mod_resources.item, items[i])
+		log_info($"adding index: {index}")
+		array_push(MystBoxPool, index)
+	}
 }

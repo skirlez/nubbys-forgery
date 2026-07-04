@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"mod_tags",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"mod_tags",
+  "parent":{
+    "name":"resources",
+    "path":"folders/Scripts/resources.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

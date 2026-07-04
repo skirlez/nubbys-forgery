@@ -1,16 +1,4 @@
-// For catspeak
 function mod_register_supervisor(supervisor, supervisor_id, wod = global.cmod) {
-	if !mod_is_id_component_valid(supervisor_id) {
-		log_error($"Mod {wod.mod_id} tried to register a supervisor with invalid ID {item_id}")
-		return;
-	}
-	if bimap_right_exists(global.registry[mod_resources.supervisor], supervisor) {
-		var current_id = bimap_get_left(global.registry[mod_resources.supervisor], supervisor)
-		log_error($"Mod {wod.mod_id} tried to register a supervisor struct with ID {supervisor_id},"
-			+ $" but this struct has already been registered prior to {current_id}! Each struct registered must be unique.")	
-		return;
-	}
-	
 	static supervisor_contract = {
 		display_name : "",
 		description : "",
@@ -22,59 +10,61 @@ function mod_register_supervisor(supervisor, supervisor_id, wod = global.cmod) {
 		on_create : global.empty_method,
 		on_destroy : global.empty_method,
 	}
-	
-	var compliance = get_struct_compliance_with_contract(supervisor, supervisor_contract)
-	if array_length(compliance.missing) > 0 || array_length(compliance.mismatched_types) > 0 {
-		log_error($"Supervisor {supervisor_id} from {wod.mod_id} has bad variables!\n" 
-			+ generate_compliance_error_text(supervisor, supervisor_contract, compliance)
-			+ "\nThe supervisor is not registered.")
-		return;
+	static optional_variables = {
+		display_name_args : [],
+		description_args : ["\n"],	
 	}
 	
-	static sprites_contract = {
-		idle_neutral : agi("spr_empty"),
-		preview : agi("spr_empty"),
-	}
-	var preview_sprite = supervisor.sprites.preview;
-	var idle_neutral_sprite = supervisor.sprites.idle_neutral;
+	var success = register_generic(mod_resources.supervisor, supervisor, supervisor_id, supervisor_contract, optional_variables,
+		function (supervisor, supervisor_id, wod) {
+			static sprites_contract = {
+				idle_neutral : agi("spr_empty"),
+				preview : agi("spr_empty"),
+			}
+			var required = get_struct_compliance_with_contract(supervisor.sprites, sprites_contract)
+			if array_length(required.missing) > 0 || array_length(required.mismatched_types) > 0 {
+				log_error($"Supervisor {supervisor_id} from {wod.mod_id} has bad sprite variables!\n" 
+					+ generate_compliance_error_text(supervisor.sprites, sprites_contract, required)
+					+ "\nSupervisor is not registered.")
+				return false;
+			}
+			
+			var preview_sprite = supervisor.sprites.preview;
+			var idle_neutral_sprite = supervisor.sprites.idle_neutral;
 	
-	var optional_sprites = {
-		preview_clicked : preview_sprite,
+			var optional_sprites = {
+				preview_clicked : preview_sprite,
 		
-		angry : idle_neutral_sprite,
-		evil : idle_neutral_sprite,
-		head_swivel : idle_neutral_sprite,
-		scream : idle_neutral_sprite,
-		idle_happy : idle_neutral_sprite,
-		idle_sad : idle_neutral_sprite,
-		idle_weird : idle_neutral_sprite,
-		talk : idle_neutral_sprite,
-		sad : idle_neutral_sprite,
-		happy : idle_neutral_sprite,
-		idle_grimace : idle_neutral_sprite
-	}
-	var required = get_struct_compliance_with_contract(supervisor.sprites, sprites_contract)
-	var optional = get_struct_compliance_with_contract(supervisor.sprites, optional_sprites)
-	var sprites_compliance = 
-	{
-		missing : required.missing,
-		mismatched_types : array_concat(required.mismatched_types, optional.mismatched_types)
-	}
-	if array_length(sprites_compliance.missing) > 0 || array_length(sprites_compliance.mismatched_types) > 0 {
-		log_error($"Supervisor {supervisor_id} from {wod.mod_id} has bad sprite variables!\n" 
-			+ generate_compliance_error_text(supervisor.sprites, sprites_contract, sprites_compliance)
-			+ "\nThe supervisor is not registered.")
-		return;
-	}
+				angry : idle_neutral_sprite,
+				evil : idle_neutral_sprite,
+				head_swivel : idle_neutral_sprite,
+				scream : idle_neutral_sprite,
+				idle_happy : idle_neutral_sprite,
+				idle_sad : idle_neutral_sprite,
+				idle_weird : idle_neutral_sprite,
+				talk : idle_neutral_sprite,
+				sad : idle_neutral_sprite,
+				happy : idle_neutral_sprite,
+				idle_grimace : idle_neutral_sprite
+			}
+			
+			var optional = get_struct_compliance_with_contract(supervisor.sprites, optional_sprites)
+			if array_length(optional.mismatched_types) > 0 {
+				optional.missing = []
+				log_error($"Supervisor {supervisor_id} from {wod.mod_id} has bad sprite variables!\n" 
+					+ generate_compliance_error_text(supervisor.sprites, optional_sprites, optional)
+					+ "\nSupervisor is not registered.")
+				return false;
+			}
+			initialize_missing(supervisor.sprites, optional_sprites)
+			return true;
+		}, 
+		"Supervisor", "a supervisor", wod.supervisors, wod)
 	
-	initialize_missing(supervisor.sprites, optional_sprites)
-
+	if !success
+		return undefined;
+	
 	var full_id = $"{wod.mod_id}:{supervisor_id}"
-	bimap_set(global.registry[mod_resources.supervisor], full_id, supervisor)
-	array_push(wod.supervisors)
-	log_info($"Supervisor {full_id} registered");
-	
-
 	// Supervisors must be indexed immediately. In principle resources need to be indexed
 	// whenever the management object is actually created, and in the case of supervisors,
 	// obj_GAME partially does this (storing highscores, wins, and whether or not you unlocked them)
@@ -98,8 +88,10 @@ function index_supervisors_for_selection() {
 		with (agi("obj_SupervisorMGMT")) {
 			var supervisor = bimap_get_right(global.index_registry[mod_resources.supervisor], index)
 			
-			SuperVisorName[index] = agi("scr_Text")(supervisor.display_name);
-			SuperVisorDesc[index] = agi("scr_Text")(supervisor.description, "\n");
+			SuperVisorName[index] = script_execute_ext(agi("scr_Text"), 
+				array_concat([supervisor.display_name], supervisor.display_name_args))
+			SuperVisorDesc[index] = script_execute_ext(agi("scr_Text"),
+				array_concat([supervisor.description], supervisor.description_args))
 			SVSprite[index] = supervisor.sprites.preview;
 			SuperVisorCol1[index] = supervisor.name_color;
 			SuperVisorCol2[index] = 255; // Unused as of now

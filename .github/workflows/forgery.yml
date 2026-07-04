@@ -10,7 +10,7 @@ jobs:
         
       # This step is taken from https://gamemaker.io/en/blog/bs-tech-automate-builds
       - name: Setup Igor
-        uses: bscotch/igor-setup@v1.3.0
+        uses: bscotch/igor-setup@v1.4.2
         id: igor
         with:
           target-yyp: ${{ github.workspace }}/nubbys-forgery.yyp
