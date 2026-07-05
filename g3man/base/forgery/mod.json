@@ -10,7 +10,7 @@
     "version" : "10.0.0",
     
     "imports": ["g3man_7"],
-    "exports" : ["forgery_7", "forgery_9", "forgery_10"],
+    "exports" : ["forgery_7", "forgery_9"],
     
     "patches" : [
         {

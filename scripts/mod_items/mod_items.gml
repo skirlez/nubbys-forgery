@@ -57,8 +57,9 @@ function register_items_for_gameplay() {
 		var obj = allocate_object(mod_resources.item, item)
 			
 		object_set_sprite(obj, item.sprite)
+		var plus = (item.level == 2 ? "+" : "");
 		agi("scr_Init_Item")(item_index,
-			script_execute_ext(agi("scr_Text"), array_concat([(item.display_name) + (item.level == 2 ? "+" : "")], item.display_name_args)),
+			script_execute_ext(agi("scr_Text"), array_concat([(item.display_name)], item.display_name_args)) + plus,
 			obj,
 			item.level,
 			item.food,

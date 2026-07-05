@@ -18,7 +18,7 @@ function mod_register_perk(perk, perk_id, wod = global.cmod) {
 		display_name_args : [],
 		description_args : ["\n"]
 	}
-	var success = register_generic(mod_resources.perk, perk, perk_id, perk_contract, optional_variables, empty_function, "Perk", "a perk", wod.perks, wod)
+	var success = register_generic(mod_resources.perk, perk, perk_id, perk_contract, optional_variables, tautology, "Perk", "a perk", wod.perks, wod)
 	if !success
 		return undefined
 	return perk;

@@ -12,7 +12,7 @@ function mod_register_challenge(challenge, challenge_id, wod = global.cmod) {
 		description_args : ["\n"],	
 	}
 	
-	var success = register_generic(mod_resources.challenge, challenge, challenge_id, challenge_contract, optional_variables, empty_function, 
+	var success = register_generic(mod_resources.challenge, challenge, challenge_id, challenge_contract, optional_variables, tautology, 
 		"Challenge", "a challenge", wod.challenges, wod)
 	if !success
 		return undefined
