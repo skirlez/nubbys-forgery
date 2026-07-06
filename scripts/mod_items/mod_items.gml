@@ -126,7 +126,7 @@ function forgery_modded_item_effect(index) {
 	}
 	global.cmod = previous_mod;
 }
-
+/*
 function forgery_get_item_desc_line_amount_fixed(desc, max_width) {
 	var font = draw_get_font();
 	return 6 + ((agi("scribble")(desc)
@@ -135,12 +135,12 @@ function forgery_get_item_desc_line_amount_fixed(desc, max_width) {
 		.wrap(max_width)
 		.get_height()) div 26);
 }
+*/
 // called from gml_Object_obj_Perk_MysteryBox_Create_0
 function add_items_to_mystery_box_perk() {
 	var items = mod_get_resources_with_tag(mod_resources.item, "forgery:mystery_box_friendly")
 	for (var i = 0; i < array_length(items); i++) {
 		var index = mod_registry_get_left(global.index_registry, mod_resources.item, items[i])
-		log_info($"adding index: {index}")
 		array_push(MystBoxPool, index)
 	}
 }

@@ -403,7 +403,7 @@ function hot_reload() {
 	}
 }
 function get_nf_version_string() {
-	return "Nubby's Forgery BETA V9"	
+	return "Nubby's Forgery v10.0.0"	
 }
 function get_nf_loaded_string() {
 	return $"({ds_map_size(global.mod_id_to_mod_map)} mod(s) loaded, "
@@ -412,4 +412,3 @@ function get_nf_loaded_string() {
 		+ $"{bimap_size(global.registry[mod_resources.supervisor])} supervisor(s), "
 		+ $"{bimap_size(global.registry[mod_resources.challenge])} challenges(s))"
 }
-
