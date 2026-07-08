@@ -9,8 +9,13 @@ patch(
 	}
 },
 function(t)
-	local i = t:find_line_with(1, 'var _Lines = 6 + ((string_height_ext(DrawDesc, 26, _DescWid - 15) - 56) div 26)')
-	t:write_replace(i, [[
-		var _Lines = 6 + ((string_height_scribble_ext(DrawDesc, _DescWid - 15) - 56) div 26)
+	local i
+	i = t:find_line_with(1, 'DrawDescY = clamp(DrawDescY, string_height_ext')
+	t:write_replace_substring(i, 'string_height_ext', [[
+		forgery_string_height_ext_desc_fixed
+	]])
+	i = t:find_line_with(1, 'var _Lines = 6 + ((string_height_ext')
+	t:write_replace_substring(i, 'string_height_ext', [[
+		forgery_string_height_ext_desc_fixed
 	]])
 end)

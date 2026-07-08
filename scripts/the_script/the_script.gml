@@ -403,7 +403,7 @@ function hot_reload() {
 	}
 }
 function get_nf_version_string() {
-	return "Nubby's Forgery v10.0.0"	
+	return "Nubby's Forgery v10.0.1"	
 }
 function get_nf_loaded_string() {
 	return $"({ds_map_size(global.mod_id_to_mod_map)} mod(s) loaded, "

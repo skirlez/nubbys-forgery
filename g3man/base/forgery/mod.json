@@ -7,7 +7,7 @@
     "target_g3man_version" : 9,
     "depends" : [],
     "breaks" : [],
-    "version" : "10.0.0",
+    "version" : "10.0.1",
     
     "imports": ["g3man_7"],
     "exports" : ["forgery_7", "forgery_9"],

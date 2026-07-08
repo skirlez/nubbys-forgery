@@ -126,16 +126,16 @@ function forgery_modded_item_effect(index) {
 	}
 	global.cmod = previous_mod;
 }
-/*
-function forgery_get_item_desc_line_amount_fixed(desc, max_width) {
+
+function forgery_string_height_ext_desc_fixed(desc, sep, max_width) {
 	var font = draw_get_font();
-	return 6 + ((agi("scribble")(desc)
+	return (agi("scribble")(desc)
 		.starting_format(font_get_name(font), c_white)
-		.line_spacing(26, 26)
+		.line_spacing(sep, sep)
 		.wrap(max_width)
-		.get_height()) div 26);
+		.get_height());
 }
-*/
+
 // called from gml_Object_obj_Perk_MysteryBox_Create_0
 function add_items_to_mystery_box_perk() {
 	var items = mod_get_resources_with_tag(mod_resources.item, "forgery:mystery_box_friendly")
